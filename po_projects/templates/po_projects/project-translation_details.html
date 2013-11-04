@@ -1,0 +1,11 @@
+{% extends "po_projects/base.html" %}
+{% load i18n crispy_forms_tags %}
+{% block title %}{{ project.name }} : {{ translation.locale }}{% endblock %}
+
+{% block content %}
+    <h2><small>{{ project.name }}</small> "{{ translation.locale }}" management</h2>
+    
+    <hr>
+    <h4>{% trans "Edit strings" %}</h4>
+    {% crispy form %}
+{% endblock %}

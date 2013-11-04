@@ -1,0 +1,31 @@
+{% extends "po_projects/base.html" %}
+{% load i18n crispy_forms_tags %}{% load url from future %}
+{% block title %}{% trans "Create a new project" %}{% endblock %}
+
+{% block content %}
+    <h2><small>{% trans "Project" %}</small> {{ project.name }}</h2>
+    
+    <hr>
+    <h3>{% trans "Project translations" %}</h3>
+    <ul>{% for item in project.projecttranslation_set.all %}
+        <li>
+            <a href="{% url 'po_projects-project-translation-details' slug=project.slug locale=item.locale %}">{{ item.locale }}</a>
+        </li>
+    {% empty %}
+        <li>There is no translation yet</li>
+    {% endfor %}</ul>
+    
+    <h4>{% trans "Add new" %}</h4>
+    {% crispy form %}
+    
+    <hr>
+    <h3>{% trans "Messages to translate" %} ({{ project.rowsource_set.count }})</h3>
+    <ul>{% for item in project.rowsource_set.all %}
+        <li>
+            <blockquote>
+                <p>{{ item.message|safe }}
+                {% comment %}<cite>{{ item.locations }}</cite>{% endcomment %}</p>
+            </blockquote>
+        </li>
+    {% endfor %}</ul>
+{% endblock %}

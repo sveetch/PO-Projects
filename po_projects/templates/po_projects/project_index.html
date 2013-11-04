@@ -1,0 +1,17 @@
+{% extends "po_projects/base.html" %}
+{% load i18n %}{% load url from future %}
+{% block title %}{% trans "Projects" %}{% endblock %}
+
+{% block content %}
+    <h2>{% trans "Projects" %}</h2>
+    
+    <p class="text-right">
+        <a href="{% url 'po_projects-project-create' %}" class="button large">Create a new project</a>
+    </p>
+    
+    <ul>{% for item in project_list %}
+        <li><a href="{% url 'po_projects-project-details' slug=item.slug %}">{{ item.name }}</a></li>
+    {% empty %}
+    <li>There is no project yet</li>
+    {% endfor %}</ul>
+{% endblock %}
