@@ -26,7 +26,7 @@ setup(
         'django-braces==1.0.0',
         'South==0.7.6',
         'djangocodemirror==0.9.3',
-        'django-crispy-forms >= 1.2, <=1.3.2',
+        'django-crispy-forms>=1.2',
     ],
     include_package_data=True,
     zip_safe=False
