@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import HTML, UneditableField
 from crispy_forms_foundation.layout import Layout, Fieldset, Row, Column, ButtonHolder, Submit
 
 from babel import Locale
@@ -112,15 +113,38 @@ class ProjectTranslationForm(forms.ModelForm):
         model = ProjectTranslation
         exclude = ('project', 'header_comment', 'mime_headers')
 
+class SourceTextField(UneditableField):
+    """
+    Layout object for rendering source field as simple html text
+    """
+    template = "po_projects/translation_source_input.html"
+
 class RowTranslationForm(forms.ModelForm):
     """Translation Form"""
     def __init__(self, translation=None, message=None, *args, **kwargs):
         self.translation = translation
         self.message = message
         
-        #self.helper = FormHelper()
-        #self.helper.form_action = '.'
-        #self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper = FormHelper()
+        self.helper.form_action = '.'
+        self.helper.layout = Layout(
+            Fieldset(
+                _('Your message'),
+                Row(
+                    Column(
+                        SourceTextField('source'),
+                        css_class='twelve'
+                    ),
+                ),
+                Row(
+                    Column(
+                        'message',
+                        css_class='twelve'
+                    ),
+                ),
+            ),
+        )
+        self.helper.add_input(Submit('submit', 'Submit'))
 
         super(RowTranslationForm, self).__init__(*args, **kwargs)
 
@@ -136,5 +160,5 @@ class RowTranslationForm(forms.ModelForm):
 
     class Meta:
         model = RowTranslate
-        exclude = ('source', 'translation')
+        exclude = ('translation',)
 

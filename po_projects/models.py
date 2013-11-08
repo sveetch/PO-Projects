@@ -57,7 +57,7 @@ class RowTranslate(models.Model):
     """
     source = models.ForeignKey(RowSource, verbose_name=_('row source'), blank=False)
     translation = models.ForeignKey(ProjectTranslation, verbose_name=_('translation'), blank=False)
-    message = models.TextField(_('message'))
+    message = models.TextField(_('message'), blank=True)
 
     def __unicode__(self):
         return self.message
