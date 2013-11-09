@@ -6,6 +6,9 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 class Project(models.Model):
+    """
+    Project contains catalog and template catalog
+    """
     name = models.CharField(_('name'), max_length=150)
     slug = models.SlugField(_('slug'), unique=True, max_length=75)
     version = models.CharField(_('version'), max_length=15)
@@ -19,9 +22,9 @@ class Project(models.Model):
         verbose_name = _('project')
         verbose_name_plural = _('projects')
 
-class RowSource(models.Model):
+class TemplateMsg(models.Model):
     """
-    TODO: should be named 'Message' instead
+    Template catalog item, equivalent to a msg from a POT file
     """
     project = models.ForeignKey(Project, verbose_name=_('project'), blank=False)
     message = models.TextField(_('message'), blank=False)
@@ -32,12 +35,12 @@ class RowSource(models.Model):
         return self.message
 
     class Meta:
-        verbose_name = _('row source')
-        verbose_name_plural = _('row sources')
+        verbose_name = _('template message')
+        verbose_name_plural = _('templates messages')
 
-class ProjectTranslation(models.Model):
+class Catalog(models.Model):
     """
-    TODO: should be named 'Catalog' instead
+    Language catalog for a project, the PO file equivalent
     """
     project = models.ForeignKey(Project, verbose_name=_('project'), blank=False)
     locale = models.CharField(_('locale'), max_length=50, blank=False)
@@ -48,20 +51,20 @@ class ProjectTranslation(models.Model):
         return self.locale
 
     class Meta:
-        verbose_name = _('project translation')
-        verbose_name_plural = _('projects translations')
+        verbose_name = _('catalog')
+        verbose_name_plural = _('catalogs')
 
-class RowTranslate(models.Model):
+class TranslationMsg(models.Model):
     """
-    TODO: should be named 'Translation' instead
+    Translation message from a catalog
     """
-    source = models.ForeignKey(RowSource, verbose_name=_('row source'), blank=False)
-    translation = models.ForeignKey(ProjectTranslation, verbose_name=_('translation'), blank=False)
+    template = models.ForeignKey(TemplateMsg, verbose_name=_('row source'), blank=False)
+    catalog = models.ForeignKey(Catalog, verbose_name=_('catalog'), blank=False)
     message = models.TextField(_('message'), blank=True)
 
     def __unicode__(self):
         return self.message
 
     class Meta:
-        verbose_name = _('row translation')
-        verbose_name_plural = _('row translations')
+        verbose_name = _('translation message')
+        verbose_name_plural = _('translations messages')

@@ -7,7 +7,7 @@
     
     <hr>
     <h3>{% trans "Project translations" %}</h3>
-    <ul>{% for item in project.projecttranslation_set.all %}
+    <ul>{% for item in project.catalog_set.all %}
         <li>
             <a href="{% url 'po_projects-translation-edit' slug=project.slug locale=item.locale %}">{{ item.locale }}</a>
         </li>
@@ -19,8 +19,8 @@
     {% crispy form %}
     
     <hr>
-    <h3>{% trans "Messages to translate" %} ({{ project.rowsource_set.count }})</h3>
-    <ul>{% for item in project.rowsource_set.all %}
+    <h3>{% trans "Messages to translate" %} ({{ project.templatemsg_set.count }})</h3>
+    <ul>{% for item in project.templatemsg_set.all %}
         <li>
             <blockquote>
                 <p>{{ item.message|safe }}

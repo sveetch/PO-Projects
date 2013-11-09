@@ -2,9 +2,9 @@
 from django.contrib import admin
 
 # Import from here
-from .models import Project, RowSource, ProjectTranslation, RowTranslate
+from .models import Project, TemplateMsg, Catalog, TranslationMsg
 
 admin.site.register(Project)
-admin.site.register(RowSource)
-admin.site.register(ProjectTranslation)
-admin.site.register(RowTranslate)
+admin.site.register(TemplateMsg)
+admin.site.register(Catalog)
+admin.site.register(TranslationMsg)

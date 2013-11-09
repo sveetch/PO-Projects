@@ -1,8 +1,5 @@
 <div id="div_{{ field.auto_id }}">
-    <div class="controls">
-        <span>{{ field.form.instance.source.message }}</span>
-        {% comment %}<input type="hidden"
-            name="{{ field.auto_id }}"
-            value="{{ field.value }}">{% endcomment %}
-    </div>
+    {{ field.label_tag }}
+    <div class="content">{{ field.form.instance.template.message|safe }}</div>
+    <input type="hidden" name="{{ field.html_name }}" value="{% if field.value %}{{ field.value }}{% endif %}">
 </div>

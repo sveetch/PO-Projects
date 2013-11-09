@@ -17,7 +17,7 @@ from babel import Locale
 from babel.core import UnknownLocaleError, get_locale_identifier
 from babel.messages.pofile import read_po
 
-from .models import Project, RowSource, ProjectTranslation, RowTranslate
+from .models import Project, TemplateMsg, Catalog, TranslationMsg
 
 class ProjectForm(forms.ModelForm):
     """Project Form"""
@@ -58,9 +58,9 @@ class ProjectForm(forms.ModelForm):
                     flags = message.flags
                     if flags == set([]):
                         flags = ''
-                    entries.append(RowSource(project=project, message=message.id, locations=json.dumps(message.locations), flags=flags))
+                    entries.append(TemplateMsg(project=project, message=message.id, locations=json.dumps(message.locations), flags=flags))
                 
-            RowSource.objects.bulk_create(entries)
+            TemplateMsg.objects.bulk_create(entries)
             
         return project
 
@@ -68,7 +68,7 @@ class ProjectForm(forms.ModelForm):
         model = Project
         exclude = ('version', 'header_comment', 'mime_headers')
 
-class ProjectTranslationForm(forms.ModelForm):
+class CatalogForm(forms.ModelForm):
     """Catalog Form"""
     def __init__(self, project=None, *args, **kwargs):
         self.project = project
@@ -77,7 +77,7 @@ class ProjectTranslationForm(forms.ModelForm):
         self.helper.form_action = '.'
         self.helper.add_input(Submit('submit', 'Submit'))
 
-        super(ProjectTranslationForm, self).__init__(*args, **kwargs)
+        super(CatalogForm, self).__init__(*args, **kwargs)
 
     def clean_locale(self):
         data = self.cleaned_data['locale']
@@ -93,38 +93,36 @@ class ProjectTranslationForm(forms.ModelForm):
         return data
 
     def save(self, commit=True):
-        trans = super(ProjectTranslationForm, self).save(commit=False)
-        trans.project = self.project
+        catalog = super(CatalogForm, self).save(commit=False)
+        catalog.project = self.project
         
         if commit:
-            trans.header_comment = self.project.header_comment
-            trans.mime_headers = self.project.mime_headers
-            trans.save()
+            catalog.header_comment = self.project.header_comment
+            catalog.mime_headers = self.project.mime_headers
+            catalog.save()
             
+            # Fill catalog with template messages
             entries = []
-            for row in self.project.rowsource_set.all():
-                entries.append(RowTranslate(source=row, translation=trans, message=''))
+            for row in self.project.templatemsg_set.all():
+                entries.append(TranslationMsg(template=row, catalog=catalog, message=''))
             
-            RowTranslate.objects.bulk_create(entries)
+            TranslationMsg.objects.bulk_create(entries)
             
-        return trans
+        return catalog
 
     class Meta:
-        model = ProjectTranslation
+        model = Catalog
         exclude = ('project', 'header_comment', 'mime_headers')
 
 class SourceTextField(UneditableField):
     """
-    Layout object for rendering source field as simple html text
+    Layout object for rendering template field as simple html text
     """
     template = "po_projects/translation_source_input.html"
 
-class RowTranslationForm(forms.ModelForm):
+class TranslationMsgForm(forms.ModelForm):
     """Translation Form"""
-    def __init__(self, translation=None, message=None, *args, **kwargs):
-        self.translation = translation
-        self.message = message
-        
+    def __init__(self, *args, **kwargs):
         self.helper = FormHelper()
         self.helper.form_action = '.'
         self.helper.layout = Layout(
@@ -132,33 +130,32 @@ class RowTranslationForm(forms.ModelForm):
                 _('Your message'),
                 Row(
                     Column(
-                        SourceTextField('source'),
-                        css_class='twelve'
+                        SourceTextField('template'),
+                        css_class='six'
                     ),
-                ),
-                Row(
                     Column(
                         'message',
-                        css_class='twelve'
+                        css_class='six'
                     ),
                 ),
             ),
         )
         self.helper.add_input(Submit('submit', 'Submit'))
 
-        super(RowTranslationForm, self).__init__(*args, **kwargs)
+        super(TranslationMsgForm, self).__init__(*args, **kwargs)
 
     def save(self, commit=True):
-        message = super(RowTranslationForm, self).save(commit=False)
-        message.source = self.message
-        message.translation = self.translation
+        message = super(TranslationMsgForm, self).save(commit=False)
         
         if commit:
             message.save()
             
-        return trans
+        return message
 
     class Meta:
-        model = RowTranslate
-        exclude = ('translation',)
+        model = TranslationMsg
+        exclude = ('catalog',)
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 3}),
+        }
 

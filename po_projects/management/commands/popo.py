@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
     def locale_tuple(self):
         """
-        Method to some dev/test/debug
+        Method to do some dev/test/debug
         """
         l = Locale.parse('en-AU')
         print "language:", l.language
