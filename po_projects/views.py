@@ -42,7 +42,7 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = ProjectForm
 
     def get_success_url(self):
-        return reverse('po_projects-project-details', args=[self.object.slug])
+        return reverse('po_projects:project-details', args=[self.object.slug])
 
     def get_form_kwargs(self):
         kwargs = super(ProjectCreateView, self).get_form_kwargs()
@@ -78,7 +78,7 @@ class ProjectDetails(LoginRequiredMixin, generic.CreateView):
         return context
 
     def get_success_url(self):
-        return reverse('po_projects-project-details', args=[self.project.slug])
+        return reverse('po_projects:project-details', args=[self.project.slug])
 
     def get_form_kwargs(self):
         kwargs = super(ProjectDetails, self).get_form_kwargs()
@@ -87,11 +87,51 @@ class ProjectDetails(LoginRequiredMixin, generic.CreateView):
         })
         return kwargs
 
-def TranslationFormView(request, slug=None, locale=None):
+class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
+    """
+    Form view to display Project details and append a new Catalog
+    """
+    model = Catalog
+    template_name = "po_projects/catalog_details.html"
+    form_class = CatalogForm
+
+    def get(self, request, *args, **kwargs):
+        self.project = self.get_project()
+        return super(CatalogDetails, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.project = self.get_project()
+        return super(CatalogDetails, self).post(request, *args, **kwargs)
+
+    def get_project(self):
+        return get_object_or_404(Project, slug=self.kwargs['slug'])
+
+    def get_object(self):
+        return get_object_or_404(Catalog, project=self.project, locale=self.kwargs['locale'])
+        
+    def get_context_data(self, **kwargs):
+        context = super(CatalogDetails, self).get_context_data(**kwargs)
+        context.update({
+            'project': self.project,
+            'catalog': self.object,
+        })
+        return context
+
+    def get_success_url(self):
+        return reverse('po_projects:catalog-details', args=[self.project.slug, self.object.locale])
+
+    def get_form_kwargs(self):
+        kwargs = super(CatalogDetails, self).get_form_kwargs()
+        kwargs.update({
+            'project': self.project,
+        })
+        return kwargs
+
+def CatalogMessagesFormView(request, slug=None, locale=None):
     """
     Implemented without CBV until i find HOW to do it
     """
-    template_name = "po_projects/translation_formset_edit.html"
+    template_name = "po_projects/catalog_messages_form.html"
     
     project = get_object_or_404(Project, slug=slug)
     catalog = get_object_or_404(Catalog, project=project, locale=locale)

@@ -1,0 +1,10 @@
+{% extends "po_projects/base.html" %}
+{% load i18n crispy_forms_tags %}
+{% block title %}{{ catalog }} Edit messages{% endblock %}
+
+{% block content %}
+    <h2><small>{{ catalog }}</small> Edit messages</h2>
+    
+    <hr>
+    {% crispy formset formset.form.helper %}
+{% endblock %}

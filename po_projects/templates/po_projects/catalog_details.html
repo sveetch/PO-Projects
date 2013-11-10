@@ -1,0 +1,19 @@
+{% extends "po_projects/base.html" %}
+{% load i18n crispy_forms_tags %}{% load url from future %}
+{% block title %}{% trans "Manage Catalog" %}{% endblock %}
+
+{% block content %}
+    <h2><small>{{ project.name }}</small> {{ catalog }}</h2>
+    
+    <hr>
+    <h4>{% trans "Edit infos" %}</h4>
+    {% crispy form %}
+    
+    <hr>
+    <h3>{% trans "Messages" %}</h3>
+    <p>There is {{ project.templatemsg_set.count }} messages in the catalog</p>
+    
+    <p class="text-right">
+        <a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a>
+    </p>
+{% endblock %}

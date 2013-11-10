@@ -118,7 +118,7 @@ class SourceTextField(UneditableField):
     """
     Layout object for rendering template field as simple html text
     """
-    template = "po_projects/translation_source_input.html"
+    template = "po_projects/input_as_text.html"
 
 class TranslationMsgForm(forms.ModelForm):
     """Translation Form"""
@@ -126,17 +126,14 @@ class TranslationMsgForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_action = '.'
         self.helper.layout = Layout(
-            Fieldset(
-                _('Your message'),
-                Row(
-                    Column(
-                        SourceTextField('template'),
-                        css_class='six'
-                    ),
-                    Column(
-                        'message',
-                        css_class='six'
-                    ),
+            Row(
+                Column(
+                    SourceTextField('template'),
+                    css_class='six'
+                ),
+                Column(
+                    'message',
+                    css_class='six'
                 ),
             ),
         )

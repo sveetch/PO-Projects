@@ -1,7 +1,28 @@
 # -*- coding: utf-8 -*-
 """
 Models for po_projects
+
+
+> Project
+    |
+    |____> TemplateMsg
+    |____> TemplateMsg
+    |____> TemplateMsg
+    |
+    |____> Catalog (fr)
+            |
+            |___> TranslationMsg
+            |___> TranslationMsg
+            |___> TranslationMsg
+    |
+    |____> Catalog (zh_hk)
+            |
+            |___> TranslationMsg
+            |___> TranslationMsg
+            |___> TranslationMsg
+
 """
+from babel.core import Locale
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -48,7 +69,8 @@ class Catalog(models.Model):
     mime_headers = models.TextField(_('mime headers'))
 
     def __unicode__(self):
-        return self.locale
+        l = Locale.parse(self.locale)
+        return l.english_name
 
     class Meta:
         verbose_name = _('catalog')
