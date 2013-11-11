@@ -11,8 +11,10 @@
     
     <hr>
     <h3>{% trans "Messages" %}</h3>
-    <p>There is {{ project.templatemsg_set.count }} messages in the catalog</p>
-    
+    <p>{% blocktrans with messages_count=catalog.get_messages|length %}There is {{ messages_count }} messages in the catalog.{% endblocktrans %}</p>
+    <h4>Translated</h4>
+    <div class="radius progress success eight"><span class="meter text-center" style="width:{{ catalog.percent_translated }}%">{{ catalog.percent_translated }}%</span></div>
+
     <p class="text-right">
         <a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a>
     </p>

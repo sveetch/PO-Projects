@@ -5,6 +5,9 @@
 {% block content %}
     <h2><small>{% trans "Project" %}</small> {{ project.name }}</h2>
     
+    <p>{% blocktrans with messages_count=project.get_messages|length %}There is {{ messages_count }} messages in the template catalog.{% endblocktrans %}</p>
+    <p class="text-right"><a href="{% url 'po_projects:project-messages' slug=project.slug %}" class="button secondary">{% trans "See messages" %}</a></p>
+
     <hr>
     <h3>{% trans "Project translations" %}</h3>
     <ul class="disc">{% for item in project.catalog_set.all %}
@@ -18,15 +21,4 @@
     <hr>
     <h4>{% trans "Add new" %}</h4>
     {% crispy form %}
-    
-    <hr>
-    <h3>{% trans "Messages to translate" %} ({{ project.templatemsg_set.count }})</h3>
-    <ul class="disc">{% for item in project.templatemsg_set.all %}
-        <li>
-            <blockquote>
-                <p>{{ item.message|safe }}
-                {% comment %}<cite>{{ item.locations }}</cite>{% endcomment %}</p>
-            </blockquote>
-        </li>
-    {% endfor %}</ul>
 {% endblock %}

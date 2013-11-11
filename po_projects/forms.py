@@ -2,7 +2,7 @@
 """
 Forms for po_projects
 """
-import json
+import json, StringIO
 
 from django.conf import settings
 from django import forms
@@ -15,17 +15,29 @@ from crispy_forms_foundation.layout import Layout, Fieldset, Row, Column, Button
 
 from babel import Locale
 from babel.core import UnknownLocaleError, get_locale_identifier
-from babel.messages.pofile import read_po
+from babel.messages.pofile import read_po, write_po
+from babel.messages.catalog import Message as BabelMessage
 
-from .models import Project, TemplateMsg, Catalog, TranslationMsg
+from .models import Project, Catalog
+
+def catalog_as_string(catalog):
+    """
+    Given a Babel Catalog return his PO export as a string
+    """
+    fpw = StringIO.StringIO()
+    write_po(fpw, catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)
+    content = fpw.getvalue()
+    fpw.close()
+    
+    return content
 
 class ProjectForm(forms.ModelForm):
     """Project Form"""
     po_file = forms.FileField(label=_('PO File'), required=True, help_text='Upload a valid PO file to initialize project strings to translate')
     
     def __init__(self, author=None, *args, **kwargs):
+        self.author = author
         self.catalog = None
-        self.catalog_entries = []
         
         self.helper = FormHelper()
         self.helper.form_action = '.'
@@ -43,34 +55,29 @@ class ProjectForm(forms.ModelForm):
 
         return data
 
+    def get_version(self):
+        return "0.1.0"
+
     def save(self, commit=True):
         project = super(ProjectForm, self).save(commit=False)
-        project.version = "0.1.0"
+        project.author = self.author
+        self.catalog.version = project.version = self.get_version()
+        #
+        project.content = catalog_as_string(self.catalog)
         
         if commit:
-            project.header_comment = self.catalog.header_comment
-            project.mime_headers = json.dumps(dict(self.catalog.mime_headers))
             project.save()
-            
-            entries = []
-            for message in self.catalog:
-                if message.id:
-                    flags = message.flags
-                    if flags == set([]):
-                        flags = ''
-                    entries.append(TemplateMsg(project=project, message=message.id, locations=json.dumps(message.locations), flags=flags))
-                
-            TemplateMsg.objects.bulk_create(entries)
             
         return project
 
     class Meta:
         model = Project
-        exclude = ('version', 'header_comment', 'mime_headers')
-
+        exclude = ('version', 'author', 'content')
+        
 class CatalogForm(forms.ModelForm):
     """Catalog Form"""
-    def __init__(self, project=None, *args, **kwargs):
+    def __init__(self, author=None, project=None, *args, **kwargs):
+        self.author = author
         self.project = project
         
         self.helper = FormHelper()
@@ -80,6 +87,10 @@ class CatalogForm(forms.ModelForm):
         super(CatalogForm, self).__init__(*args, **kwargs)
 
     def clean_locale(self):
+        """
+        Try to parse the given locale identifier, if success return the full 
+        identifier (as a string) finded by the babel locale parser
+        """
         data = self.cleaned_data['locale']
         if data:
             # only accept "_" as separator, all "-" are replaced to "_"
@@ -91,68 +102,66 @@ class CatalogForm(forms.ModelForm):
             else:
                 data = get_locale_identifier((self.locale_trans.language, self.locale_trans.territory, self.locale_trans.script, self.locale_trans.variant), sep='_')
         return data
-
+    
     def save(self, commit=True):
         catalog = super(CatalogForm, self).save(commit=False)
         catalog.project = self.project
+        catalog.author = self.author
+        # Get the template catalog from project then fill it with meta datas from the catalog
+        template_catalog = self.project.get_babel_catalog()
+        template_catalog.last_translator = "{full_name} <{email}>".format(full_name=self.author.get_full_name(), email=self.author.email)
+        template_catalog.locale = catalog.get_babel_locale()
+        #template_catalog.revision_date = foo
+        
+        catalog.content = catalog_as_string(template_catalog)
         
         if commit:
-            catalog.header_comment = self.project.header_comment
-            catalog.mime_headers = self.project.mime_headers
             catalog.save()
-            
-            # Fill catalog with template messages
-            entries = []
-            for row in self.project.templatemsg_set.all():
-                entries.append(TranslationMsg(template=row, catalog=catalog, message=''))
-            
-            TranslationMsg.objects.bulk_create(entries)
             
         return catalog
 
     class Meta:
         model = Catalog
-        exclude = ('project', 'header_comment', 'mime_headers')
+        exclude = ('project', 'author', 'content')
 
-class SourceTextField(UneditableField):
-    """
-    Layout object for rendering template field as simple html text
-    """
-    template = "po_projects/input_as_text.html"
+class CatalogMessagesForm(forms.Form):
+    """Catalog messages Form"""
+    def __init__(self, project=None, author=None, *args, **kwargs):
+        self.project = project
+        self.author = author
+        self.catalog = kwargs.pop('instance')
 
-class TranslationMsgForm(forms.ModelForm):
-    """Translation Form"""
-    def __init__(self, *args, **kwargs):
+        super(CatalogMessagesForm, self).__init__(*args, **kwargs)
+        
+        for i, msg in enumerate(self.catalog.get_messages()):
+            self.fields['msg_{0}'.format(i)] = forms.CharField(label=msg.id, widget=forms.Textarea(attrs={'rows':'3'}), required=False)
+        
         self.helper = FormHelper()
         self.helper.form_action = '.'
-        self.helper.layout = Layout(
-            Row(
-                Column(
-                    SourceTextField('template'),
-                    css_class='six'
-                ),
-                Column(
-                    'message',
-                    css_class='six'
-                ),
-            ),
-        )
         self.helper.add_input(Submit('submit', 'Submit'))
-
-        super(TranslationMsgForm, self).__init__(*args, **kwargs)
-
-    def save(self, commit=True):
-        message = super(TranslationMsgForm, self).save(commit=False)
+    
+    def clean(self):
+        cleaned_data = super(CatalogMessagesForm, self).clean()
         
+        for i, msg in enumerate(self.catalog.get_messages()):
+            field_id = 'msg_{0}'.format(i)
+            #try:
+            BabelMessage(msg.id, string=cleaned_data[field_id], locations=msg.locations, flags=msg.flags).check(self.catalog.get_babel_catalog())
+            #except ???:
+                #self._errors[field_id] = self.error_class(["Unvalid message"])
+                #del cleaned_data[field_id]
+        
+        return cleaned_data
+        
+    def save(self, commit=True):
         if commit:
-            message.save()
+            babel_catalog = self.catalog.get_babel_catalog()
+            for i, msg in enumerate(self.catalog.get_messages()):
+                field_id = 'msg_{0}'.format(i)
+                babel_catalog[msg.id].string = self.cleaned_data[field_id]
             
-        return message
-
-    class Meta:
-        model = TranslationMsg
-        exclude = ('catalog',)
-        widgets = {
-            'message': forms.Textarea(attrs={'rows': 3}),
-        }
-
+            self.catalog.content = catalog_as_string(babel_catalog)
+            
+            self.catalog.save()
+        
+        return self.catalog

@@ -19,10 +19,10 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
 from babel.messages.pofile import read_po
 
-from .models import Project, TemplateMsg, Catalog, TranslationMsg
-from .forms import ProjectForm, CatalogForm, TranslationMsgForm
+from .models import Project, Catalog
+from .forms import ProjectForm, CatalogForm, CatalogMessagesForm
 
-class ProjectIndex(generic.TemplateView):
+class ProjectIndexView(generic.TemplateView):
     """
     Project index
     """
@@ -38,8 +38,8 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     Form view to create a Project
     """
     model = Project
-    template_name = "po_projects/project_form.html"
     form_class = ProjectForm
+    template_name = "po_projects/project_form.html"
 
     def get_success_url(self):
         return reverse('po_projects:project-details', args=[self.object.slug])
@@ -51,27 +51,28 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
         })
         return kwargs
 
-class ProjectDetails(LoginRequiredMixin, generic.CreateView):
+class ProjectDetailsView(LoginRequiredMixin, generic.CreateView):
     """
     Form view to display Project details and append a new Catalog
     """
     model = Catalog
-    template_name = "po_projects/project_details.html"
     form_class = CatalogForm
+    template_name = "po_projects/project_details.html"
 
     def get(self, request, *args, **kwargs):
         self.project = self.get_project(**kwargs)
-        return super(ProjectDetails, self).get(request, *args, **kwargs)
+        return super(ProjectDetailsView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.project = self.get_project(**kwargs)
-        return super(ProjectDetails, self).post(request, *args, **kwargs)
+        return super(ProjectDetailsView, self).post(request, *args, **kwargs)
 
     def get_project(self, **kwargs):
         return get_object_or_404(Project, slug=kwargs['slug'])
         
     def get_context_data(self, **kwargs):
-        context = super(ProjectDetails, self).get_context_data(**kwargs)
+        context = super(ProjectDetailsView, self).get_context_data(**kwargs)
+        self.project.get_messages()
         context.update({
             'project': self.project,
         })
@@ -81,27 +82,35 @@ class ProjectDetails(LoginRequiredMixin, generic.CreateView):
         return reverse('po_projects:project-details', args=[self.project.slug])
 
     def get_form_kwargs(self):
-        kwargs = super(ProjectDetails, self).get_form_kwargs()
+        kwargs = super(ProjectDetailsView, self).get_form_kwargs()
         kwargs.update({
             'project': self.project,
+            'author': self.request.user,
         })
         return kwargs
 
-class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
+class ProjectMessagesView(generic.DetailView):
+    """
+    Project message list
+    """
+    model = Project
+    template_name = "po_projects/project_messages.html"
+
+class CatalogDetailsView(LoginRequiredMixin, generic.UpdateView):
     """
     Form view to display Project details and append a new Catalog
     """
     model = Catalog
-    template_name = "po_projects/catalog_details.html"
     form_class = CatalogForm
+    template_name = "po_projects/catalog_details.html"
 
     def get(self, request, *args, **kwargs):
         self.project = self.get_project()
-        return super(CatalogDetails, self).get(request, *args, **kwargs)
+        return super(CatalogDetailsView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.project = self.get_project()
-        return super(CatalogDetails, self).post(request, *args, **kwargs)
+        return super(CatalogDetailsView, self).post(request, *args, **kwargs)
 
     def get_project(self):
         return get_object_or_404(Project, slug=self.kwargs['slug'])
@@ -110,7 +119,7 @@ class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
         return get_object_or_404(Catalog, project=self.project, locale=self.kwargs['locale'])
         
     def get_context_data(self, **kwargs):
-        context = super(CatalogDetails, self).get_context_data(**kwargs)
+        context = super(CatalogDetailsView, self).get_context_data(**kwargs)
         context.update({
             'project': self.project,
             'catalog': self.object,
@@ -121,33 +130,60 @@ class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
         return reverse('po_projects:catalog-details', args=[self.project.slug, self.object.locale])
 
     def get_form_kwargs(self):
-        kwargs = super(CatalogDetails, self).get_form_kwargs()
+        kwargs = super(CatalogDetailsView, self).get_form_kwargs()
         kwargs.update({
             'project': self.project,
+            'author': self.request.user,
         })
         return kwargs
 
-def CatalogMessagesFormView(request, slug=None, locale=None):
+class CatalogMessagesEditView(LoginRequiredMixin, generic.UpdateView):
     """
-    Implemented without CBV until i find HOW to do it
+    Catalog message list form
     """
-    template_name = "po_projects/catalog_messages_form.html"
+    model = Catalog
+    form_class = CatalogMessagesForm
+    template_name = "po_projects/catalog_messages.html"
+
+    def get(self, request, *args, **kwargs):
+        self.project = self.get_project()
+        return super(CatalogMessagesEditView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.project = self.get_project()
+        return super(CatalogMessagesEditView, self).post(request, *args, **kwargs)
+
+    def get_project(self):
+        return get_object_or_404(Project, slug=self.kwargs['slug'])
     
-    project = get_object_or_404(Project, slug=slug)
-    catalog = get_object_or_404(Catalog, project=project, locale=locale)
-    
-    formset_queryset = TranslationMsg.objects.select_related('template').filter(catalog=catalog)
-    
-    TranslationMsgFormSet = modelformset_factory(TranslationMsg, form=TranslationMsgForm, fields=('template','message',), extra=0)
-    
-    formset = TranslationMsgFormSet(request.POST or None, queryset=formset_queryset)
-    
-    if formset.is_valid():
-        formset.save()
-    
-    extra_context = {
-        "project": project,
-        "catalog": catalog,
-        "formset": formset
-    }
-    return render_to_response(template_name, extra_context, context_instance=RequestContext(request))
+    def get_object(self, queryset=None):
+        return get_object_or_404(Catalog, project=self.project, locale=self.kwargs['locale'])
+        
+    def get_context_data(self, **kwargs):
+        context = super(CatalogMessagesEditView, self).get_context_data(**kwargs)
+        context.update({
+            'project': self.project,
+            'catalog': self.object,
+        })
+        return context
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = {}
+        for i, msg in enumerate(self.object.get_messages()):
+            initial['msg_{0}'.format(i)] = msg.string
+            
+        return initial.copy()
+
+    def get_success_url(self):
+        return reverse('po_projects:catalog-messages-edit', args=[self.project.slug, self.object.locale])
+
+    def get_form_kwargs(self):
+        kwargs = super(CatalogMessagesEditView, self).get_form_kwargs()
+        kwargs.update({
+            'project': self.project,
+            'author': self.request.user,
+        })
+        return kwargs
