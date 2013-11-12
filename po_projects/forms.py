@@ -22,7 +22,7 @@ from .models import Project, Catalog
 
 def catalog_as_string(catalog):
     """
-    Given a Babel Catalog return his PO export as a string
+    Given a Babel Catalog return his PO export as a plain string
     """
     fpw = StringIO.StringIO()
     write_po(fpw, catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)
@@ -33,7 +33,7 @@ def catalog_as_string(catalog):
 
 class ProjectForm(forms.ModelForm):
     """Project Form"""
-    po_file = forms.FileField(label=_('PO File'), required=True, help_text='Upload a valid PO file to initialize project strings to translate')
+    pot_file = forms.FileField(label=_('POT File'), required=True, help_text='Upload a valid POT file to initialize project strings to translate')
     
     def __init__(self, author=None, *args, **kwargs):
         self.author = author
@@ -45,13 +45,13 @@ class ProjectForm(forms.ModelForm):
 
         super(ProjectForm, self).__init__(*args, **kwargs)
 
-    def clean_po_file(self):
-        data = self.cleaned_data['po_file']
+    def clean_pot_file(self):
+        data = self.cleaned_data['pot_file']
         if data:
             try:
                 self.catalog = read_po(data, ignore_obsolete=True)
             except:
-                raise forms.ValidationError("Your file does not seem to be a valid PO file")
+                raise forms.ValidationError("Your file does not seem to be a valid POT file")
 
         return data
 
@@ -61,7 +61,8 @@ class ProjectForm(forms.ModelForm):
     def save(self, commit=True):
         project = super(ProjectForm, self).save(commit=False)
         project.author = self.author
-        self.catalog.version = project.version = self.get_version()
+        #self.catalog.version = project.version = self.get_version()
+        project.version = self.catalog.version
         #
         project.content = catalog_as_string(self.catalog)
         
@@ -73,6 +74,54 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         exclude = ('version', 'author', 'content')
+
+class ProjectUpdateForm(forms.ModelForm):
+    """Project update Form"""
+    pot_file = forms.FileField(label=_('POT File'), required=True, help_text='Upload a valid POT file to update all catalogs')
+    
+    def __init__(self, author=None, *args, **kwargs):
+        self.author = author
+        
+        self.helper = FormHelper()
+        self.helper.form_action = '.'
+        self.helper.add_input(Submit('submit', 'Submit'))
+
+        super(ProjectUpdateForm, self).__init__(*args, **kwargs)
+
+    def clean_pot_file(self):
+        data = self.cleaned_data['pot_file']
+        if data:
+            try:
+                self.catalog = read_po(data, ignore_obsolete=True)
+            except:
+                raise forms.ValidationError("Your file does not seem to be a valid POT file")
+
+        return data
+
+    def save(self, commit=True):
+        project = super(ProjectUpdateForm, self).save(commit=False)
+        project.content = catalog_as_string(self.catalog)
+        
+        if commit:
+            project.save()
+            
+            update_project_catalogs(project, project.get_babel_catalog(force=True))
+            
+        return project
+
+def update_project_catalogs(project, template_catalog, commit=True):
+    """
+    Update all project catalogs from his template catalog
+    """
+    for catalog in project.catalog_set.all().order_by('id'):
+        babel_catalog = catalog.get_babel_catalog()
+        babel_catalog.update(template_catalog)
+        
+        catalog.content = catalog_as_string(babel_catalog)
+        if commit:
+            catalog.save()
+        
+    return 
         
 class CatalogForm(forms.ModelForm):
     """Catalog Form"""
@@ -135,6 +184,7 @@ class CatalogMessagesForm(forms.Form):
         
         for i, msg in enumerate(self.catalog.get_messages()):
             self.fields['msg_{0}'.format(i)] = forms.CharField(label=msg.id, widget=forms.Textarea(attrs={'rows':'3'}), required=False)
+            # TODO: add a checkbox to manage Fuzzy flag
         
         self.helper = FormHelper()
         self.helper.form_action = '.'
@@ -145,6 +195,7 @@ class CatalogMessagesForm(forms.Form):
         
         for i, msg in enumerate(self.catalog.get_messages()):
             field_id = 'msg_{0}'.format(i)
+            # TODO: find errors to test the exception and catch it rightly
             #try:
             BabelMessage(msg.id, string=cleaned_data[field_id], locations=msg.locations, flags=msg.flags).check(self.catalog.get_babel_catalog())
             #except ???:
@@ -156,6 +207,7 @@ class CatalogMessagesForm(forms.Form):
     def save(self, commit=True):
         if commit:
             babel_catalog = self.catalog.get_babel_catalog()
+            # From each given field, fill the catalog rows
             for i, msg in enumerate(self.catalog.get_messages()):
                 field_id = 'msg_{0}'.format(i)
                 babel_catalog[msg.id].string = self.cleaned_data[field_id]

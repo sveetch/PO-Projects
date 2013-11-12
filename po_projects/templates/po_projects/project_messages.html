@@ -6,6 +6,11 @@
     <h2><small>{% trans "Project" %}</small> {{ project.name }} {% blocktrans with messages_count=project.get_babel_catalog|length %}messages ({{ messages_count }}){% endblocktrans %}</h2>
     
     <hr>
+    <h3>{% trans "Update" %}</h3>
+    {% crispy form %}
+    
+    <hr>
+    <h3>{% trans "Messages" %}</h3>
     <ul class="disc">{% for msg in project.get_babel_catalog %}{% if not msg.fuzzy %}
         <li>
             <p><small>{{ msg.locations }}</small></p>

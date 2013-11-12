@@ -26,8 +26,8 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
-    def get_babel_catalog(self):
-        if not hasattr(self, "_babel_catalog"):
+    def get_babel_catalog(self, force=True):
+        if not hasattr(self, "_babel_catalog") or force == True:
             setattr(self, "_babel_catalog", read_po(StringIO.StringIO(self.content), ignore_obsolete=True))
         return getattr(self, "_babel_catalog")
 
@@ -61,9 +61,9 @@ class Catalog(models.Model):
             setattr(self, "_babel_locale", Locale.parse(self.locale))
         return getattr(self, "_babel_locale")
 
-    def get_babel_catalog(self):
+    def get_babel_catalog(self, force=True):
         """Return the Babel Catalog instance filled from the content"""
-        if not hasattr(self, "_babel_catalog"):
+        if not hasattr(self, "_babel_catalog") or force == True:
             setattr(self, "_babel_catalog", read_po(StringIO.StringIO(self.content), locale=self.get_babel_locale(), ignore_obsolete=True))
         return getattr(self, "_babel_catalog")
 

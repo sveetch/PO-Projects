@@ -20,7 +20,7 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from babel.messages.pofile import read_po
 
 from .models import Project, Catalog
-from .forms import ProjectForm, CatalogForm, CatalogMessagesForm
+from .forms import ProjectForm, ProjectUpdateForm, CatalogForm, CatalogMessagesForm
 
 class ProjectIndexView(generic.TemplateView):
     """
@@ -69,17 +69,16 @@ class ProjectDetailsView(LoginRequiredMixin, generic.CreateView):
 
     def get_project(self, **kwargs):
         return get_object_or_404(Project, slug=kwargs['slug'])
+
+    def get_success_url(self):
+        return reverse('po_projects:project-details', args=[self.project.slug])
         
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailsView, self).get_context_data(**kwargs)
-        self.project.get_messages()
         context.update({
             'project': self.project,
         })
         return context
-
-    def get_success_url(self):
-        return reverse('po_projects:project-details', args=[self.project.slug])
 
     def get_form_kwargs(self):
         kwargs = super(ProjectDetailsView, self).get_form_kwargs()
@@ -89,12 +88,24 @@ class ProjectDetailsView(LoginRequiredMixin, generic.CreateView):
         })
         return kwargs
 
-class ProjectMessagesView(generic.DetailView):
+class ProjectMessagesView(LoginRequiredMixin, generic.UpdateView):
     """
-    Project message list
+    Form view to update the template catalog all project's catalog
+    with a POT file
     """
     model = Project
+    form_class = ProjectUpdateForm
     template_name = "po_projects/project_messages.html"
+
+    def get_success_url(self):
+        return reverse('po_projects:project-messages', args=[self.object.slug])
+
+    def get_form_kwargs(self):
+        kwargs = super(ProjectMessagesView, self).get_form_kwargs()
+        kwargs.update({
+            'author': self.request.user,
+        })
+        return kwargs
 
 class CatalogDetailsView(LoginRequiredMixin, generic.UpdateView):
     """

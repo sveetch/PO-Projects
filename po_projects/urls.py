@@ -4,7 +4,9 @@ Root url's map for application
 """
 from django.conf.urls.defaults import *
 
-from .views import ProjectIndexView, ProjectCreateView, ProjectDetailsView, ProjectMessagesView, CatalogDetailsView, CatalogMessagesEditView
+from .views import (ProjectIndexView, ProjectCreateView, ProjectDetailsView, 
+                    ProjectMessagesView, 
+                    CatalogDetailsView, CatalogMessagesEditView)
 
 urlpatterns = patterns('',
     url(r'^$', ProjectIndexView.as_view(), name='project-index'),
