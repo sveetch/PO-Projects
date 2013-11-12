@@ -1,4 +1,4 @@
-**PO Projects** is a first attempt to build a PO file management factory like, 
+**PO Projects** is a first attempt to build a PO file management factory, 
 somehow like Transifex, but more simplest.
 
 Principle is to have a frontend board to create new PO project from a POT file to import, 
@@ -10,8 +10,10 @@ in your app (django or another).
 Actually we have
 ================
 
-* Frontend to create new project from a PO/POT file;
-* Frontend to create new project translation;
+* View to create new project from a PO/POT file;
+* View to create new project catalog;
+* View to edit project catalog;
+* View to update project catalogs from a template catalog (*.POT);
 
 For beta staging this should implement
 ======================================
