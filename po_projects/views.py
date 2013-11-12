@@ -184,7 +184,8 @@ class CatalogMessagesEditView(LoginRequiredMixin, generic.UpdateView):
         """
         initial = {}
         for i, msg in enumerate(self.object.get_messages()):
-            initial['msg_{0}'.format(i)] = msg.string
+            initial[self.form_class._message_fuzzy_fieldname.format(i)] = msg.fuzzy
+            initial[self.form_class._message_text_fieldname.format(i)] = msg.string
             
         return initial.copy()
 

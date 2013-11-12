@@ -33,7 +33,7 @@ def catalog_as_string(catalog):
 
 class ProjectForm(forms.ModelForm):
     """Project Form"""
-    pot_file = forms.FileField(label=_('POT File'), required=True, help_text='Upload a valid POT file to initialize project strings to translate')
+    pot_file = forms.FileField(label=_('POT File'), required=True, help_text='Upload a valid POT file to initialize project catalogs')
     
     def __init__(self, author=None, *args, **kwargs):
         self.author = author
@@ -175,6 +175,9 @@ class CatalogForm(forms.ModelForm):
 
 class CatalogMessagesForm(forms.Form):
     """Catalog messages Form"""
+    _message_fuzzy_fieldname = 'msg_fuzzy_{0}'
+    _message_text_fieldname = 'msg_string_{0}'
+    
     def __init__(self, project=None, author=None, *args, **kwargs):
         self.project = project
         self.author = author
@@ -182,19 +185,40 @@ class CatalogMessagesForm(forms.Form):
 
         super(CatalogMessagesForm, self).__init__(*args, **kwargs)
         
+        # Add each catalog message as a field group (checkbox+textarea) with its layout
+        messages_layout = []
         for i, msg in enumerate(self.catalog.get_messages()):
-            self.fields['msg_{0}'.format(i)] = forms.CharField(label=msg.id, widget=forms.Textarea(attrs={'rows':'3'}), required=False)
-            # TODO: add a checkbox to manage Fuzzy flag
+            self.fields[self._message_fuzzy_fieldname.format(i)] = forms.BooleanField(label="fuzzy", required=False)
+            self.fields[self._message_text_fieldname.format(i)] = forms.CharField(label=msg.id, widget=forms.Textarea(attrs={'rows':'3'}), required=False)
+            messages_layout.append(Row(
+                Column(
+                    self._message_fuzzy_fieldname.format(i),
+                    css_class='one'
+                ),
+                Column(
+                    self._message_text_fieldname.format(i),
+                    css_class='eleven'
+                ),
+            ))
+        messages_layout.append(Row(
+            Column(
+                ButtonHolder(
+                    Submit('submit', _('Send')),
+                    css_class="text-right"
+                ),
+                css_class='twelve'
+            ),
+        ))
         
         self.helper = FormHelper()
         self.helper.form_action = '.'
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.layout = Layout(*messages_layout)
     
     def clean(self):
         cleaned_data = super(CatalogMessagesForm, self).clean()
         
         for i, msg in enumerate(self.catalog.get_messages()):
-            field_id = 'msg_{0}'.format(i)
+            field_id = self._message_text_fieldname.format(i)
             # TODO: find errors to test the exception and catch it rightly
             #try:
             BabelMessage(msg.id, string=cleaned_data[field_id], locations=msg.locations, flags=msg.flags).check(self.catalog.get_babel_catalog())
@@ -209,8 +233,19 @@ class CatalogMessagesForm(forms.Form):
             babel_catalog = self.catalog.get_babel_catalog()
             # From each given field, fill the catalog rows
             for i, msg in enumerate(self.catalog.get_messages()):
-                field_id = 'msg_{0}'.format(i)
-                babel_catalog[msg.id].string = self.cleaned_data[field_id]
+                # Update the string from the textarea
+                string_field_id = self._message_text_fieldname.format(i)
+                babel_catalog[msg.id].string = self.cleaned_data[string_field_id]
+                
+                # Update the fuzzy flag from the checkbox value
+                fuzzy_field_id = self._message_fuzzy_fieldname.format(i)
+                flags = list(babel_catalog[msg.id].flags)
+                if self.cleaned_data[fuzzy_field_id] and 'fuzzy' not in flags:
+                    flags.append('fuzzy')
+                elif not self.cleaned_data[fuzzy_field_id] and 'fuzzy' in flags:
+                    flags = [f for f in flags if f!='fuzzy']
+                
+                babel_catalog[msg.id].flags = flags
             
             self.catalog.content = catalog_as_string(babel_catalog)
             
