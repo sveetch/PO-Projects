@@ -180,7 +180,7 @@ class CatalogMessagesEditView(LoginRequiredMixin, generic.UpdateView):
 
     def get_initial(self):
         """
-        Returns the initial data to use for forms on this view.
+        Returns the initial data for message fields
         """
         initial = {}
         for i, msg in enumerate(self.object.get_messages()):
