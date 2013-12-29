@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, UneditableField
+from crispy_forms.bootstrap import UneditableField
 from crispy_forms_foundation.layout import Layout, Fieldset, Row, Column, ButtonHolder, Submit
 
 from babel import Locale
