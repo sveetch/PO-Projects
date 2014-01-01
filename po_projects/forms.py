@@ -88,6 +88,8 @@ class CatalogForm(forms.ModelForm):
                 self.locale_trans = Locale.parse(data)
             except UnknownLocaleError:
                 raise forms.ValidationError("Invalid locale")
+            except ValueError:
+                raise forms.ValidationError("Invalid locale")
             else:
                 data = get_locale_identifier((self.locale_trans.language, self.locale_trans.territory, self.locale_trans.script, self.locale_trans.variant), sep='_')
         return data

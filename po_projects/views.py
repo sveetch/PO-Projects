@@ -163,7 +163,7 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
     fileobject
     """
     content_type = 'text/x-gettext-translation'
-    filename_format = "messages_{timestamp}.po"
+    filename_format = "messages_{locale_name}_{timestamp}.po"
 
     def get(self, request, *args, **kwargs):
         self.project = self.get_project()
@@ -181,6 +181,7 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
         context.update({
             'project': self.project,
             'catalog': self.object,
+            'locale_name': self.object.locale,
             'timestamp': self.get_filename_timestamp(),
         })
         return context
