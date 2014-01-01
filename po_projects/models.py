@@ -83,6 +83,7 @@ class TranslationMsg(models.Model):
     template = models.ForeignKey(TemplateMsg, verbose_name=_('row source'), blank=False)
     catalog = models.ForeignKey(Catalog, verbose_name=_('catalog'), blank=False)
     message = models.TextField(_('message'), blank=True)
+    # TODO: add fuzzy boolean field
 
     def __unicode__(self):
         return self.message

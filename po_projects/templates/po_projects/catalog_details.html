@@ -14,6 +14,7 @@
     <p>There is {{ project.templatemsg_set.count }} messages in the catalog</p>
     
     <p class="text-right">
+        <a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Download PO" %}</a>
         <a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a>
     </p>
 {% endblock %}

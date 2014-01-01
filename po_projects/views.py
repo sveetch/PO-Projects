@@ -2,7 +2,7 @@
 """
 Page document views
 """
-import os
+import json, os, StringIO
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -17,10 +17,12 @@ from django.forms.models import modelformset_factory
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
-from babel.messages.pofile import read_po
+from babel.messages.pofile import read_po, write_po
+from babel.messages.catalog import Catalog as BabelCatalog
 
 from .models import Project, TemplateMsg, Catalog, TranslationMsg
 from .forms import ProjectForm, CatalogForm, TranslationMsgForm
+from .utils import DownloadMixin
 
 class ProjectIndex(generic.TemplateView):
     """
@@ -89,7 +91,7 @@ class ProjectDetails(LoginRequiredMixin, generic.CreateView):
 
 class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
     """
-    Form view to display Project details and append a new Catalog
+    Form view to display Catalog details and edit its infos
     """
     model = Catalog
     template_name = "po_projects/catalog_details.html"
@@ -151,3 +153,53 @@ def CatalogMessagesFormView(request, slug=None, locale=None):
         "formset": formset
     }
     return render_to_response(template_name, extra_context, context_instance=RequestContext(request))
+
+
+class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View):
+    """
+    Generic view to export PO file
+    
+    Inherits must implement at least the ``get_content()`` method to return the content 
+    fileobject
+    """
+    content_type = 'text/x-gettext-translation'
+    filename_format = "messages_{timestamp}.po"
+
+    def get(self, request, *args, **kwargs):
+        self.project = self.get_project()
+        self.object = self.get_object()
+        return super(CatalogMessagesExportView, self).get(request, *args, **kwargs)
+    
+    def get_project(self):
+        return get_object_or_404(Project, slug=self.kwargs['slug'])
+
+    def get_object(self):
+        return get_object_or_404(Catalog, project=self.project, locale=self.kwargs['locale'])
+        
+    def get_context_data(self, **kwargs):
+        context = super(CatalogMessagesExportView, self).get_context_data(**kwargs)
+        context.update({
+            'project': self.project,
+            'catalog': self.object,
+            'timestamp': self.get_filename_timestamp(),
+        })
+        return context
+    
+    def get_filename(self, context):
+        return self.filename_format.format(**context)
+    
+    def get_content(self, context):
+        forged_catalog = BabelCatalog(
+            locale=self.object.locale, 
+            header_comment=self.object.header_comment,
+            project=self.project.name,
+            version=self.project.version
+        )
+        
+        for entry in self.object.translationmsg_set.all().order_by('id'):
+            locations = [tuple(item) for item in json.loads(entry.template.locations)]
+            forged_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=entry.template.flags)
+            
+        fpw = StringIO.StringIO()
+        write_po(fpw, forged_catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)
+        return fpw.getvalue()

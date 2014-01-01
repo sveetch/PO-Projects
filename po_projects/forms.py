@@ -129,11 +129,11 @@ class TranslationMsgForm(forms.ModelForm):
             Row(
                 Column(
                     SourceTextField('template'),
-                    css_class='six'
+                    css_class='small-6'
                 ),
                 Column(
                     'message',
-                    css_class='six'
+                    css_class='small-6'
                 ),
             ),
         )
