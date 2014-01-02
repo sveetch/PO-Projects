@@ -13,11 +13,11 @@ Actually we have
 * View to create new project from a PO/POT file;
 * View to create new project translation and edit them;
 * View to export project translations as PO files;
+* View to export an archive (zip/tarball) of all translations as PO files from a project;
 
 For beta staging this should implement
 ======================================
 
-* View to export an archive (zip/tarball) of all translations as PO files from a project;
 * Rich editor usage (with colored syntax) on text edit;
 * Better model admin;
 * Permission restriction;

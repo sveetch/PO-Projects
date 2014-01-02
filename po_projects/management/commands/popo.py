@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-General Command line tool
+Just a command line to test some things in development
 """
-import StringIO, json, os
+from cStringIO import StringIO
+import json, os, tarfile, time
 
 from optparse import OptionValueError, make_option
 
@@ -16,12 +17,14 @@ from django.core.cache import cache
 from django.core.management.base import CommandError, BaseCommand
 
 from po_projects.models import Project, Catalog, TranslationMsg
+from po_projects.dump import po_project_export
+
+PO_ARCHIVE_PATH = "locale/{locale}/LC_MESSAGES/messages.po"
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option("--source", dest="source_filepath", default=None, help="Source to import."),
-        make_option("--target", dest="target_filepath", default=None, help="Path to write exported file"),
-        #make_option("--clearcache", dest="clearcache", action="store_true", default=False, help="Clear all documents (Page and Insert) cache."),
+        make_option("--project", dest="project_slug", default=None, help="Project slug to export"),
     )
     help = "PO Project CLI"
 
@@ -30,15 +33,34 @@ class Command(BaseCommand):
             raise CommandError("Command doesn't accept any arguments")
         
         self.source_filepath = options.get('source_filepath')
-        self.target_filepath = options.get('target_filepath')
+        self.project_slug = options.get('project_slug')
         self.verbosity = int(options.get('verbosity'))
         
         self.just_do_it()
 
     def just_do_it(self):
-        self.po_export()
+        self.do_po_project_export()
 
-    def po_export(self):
+    def do_po_project_export(self):
+        """
+        Export all catalogs from a project into PO files with the good directory 
+        structure
+        """
+        if not self.project_slug:
+            raise CommandError("project slug is empty")
+        
+        # Open and fill tarball archive
+        #archive_file = StringIO()
+        archive_file = open("{0}.tar.gz".format(self.project_slug), "wb")
+        
+        po_project_export(self.project_slug, archive_file)
+        
+        archive_file.close()
+
+    def po_catalog_export(self):
+        """
+        Export a catalog from a project into a PO file
+        """
         toast_path = "/home/django/Emencia/po_headquarter/dummy_po/"
         
         project = Project.objects.get(slug='dummy')
@@ -64,7 +86,7 @@ class Command(BaseCommand):
         
         print
         print "---------------- Original"
-        fpw = StringIO.StringIO()
+        fpw = StringIO()
         write_po(fpw, forged_catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)
         print fpw.getvalue()
         fpw.close()
@@ -75,7 +97,7 @@ class Command(BaseCommand):
         template_catalog_3 = read_po(fp3)
         forged_catalog.update(template_catalog_3)
         
-        fpw = StringIO.StringIO()
+        fpw = StringIO()
         write_po(fpw, forged_catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)
         print fpw.getvalue()
         fpw.close()

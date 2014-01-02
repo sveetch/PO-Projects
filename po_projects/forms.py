@@ -17,7 +17,7 @@ from babel import Locale
 from babel.core import UnknownLocaleError, get_locale_identifier
 from babel.messages.pofile import read_po
 
-from .models import Project, TemplateMsg, Catalog, TranslationMsg
+from po_projects.models import Project, TemplateMsg, Catalog, TranslationMsg
 
 class ProjectForm(forms.ModelForm):
     """Project Form"""
