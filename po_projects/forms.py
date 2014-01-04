@@ -72,7 +72,7 @@ class CatalogForm(forms.ModelForm):
     """Catalog Form"""
     def __init__(self, project=None, *args, **kwargs):
         self.project = project
-        
+        self.fill_messages = not(kwargs.get('instance'))
         self.helper = FormHelper()
         self.helper.form_action = '.'
         self.helper.add_input(Submit('submit', 'Submit'))
@@ -103,12 +103,13 @@ class CatalogForm(forms.ModelForm):
             catalog.mime_headers = self.project.mime_headers
             catalog.save()
             
-            # Fill catalog with template messages
-            entries = []
-            for row in self.project.templatemsg_set.all():
-                entries.append(TranslationMsg(template=row, catalog=catalog, message=''))
+            # Only fill catalog with template messages on the first create
+            if self.fill_messages:
+                entries = []
+                for row in self.project.templatemsg_set.all():
+                    entries.append(TranslationMsg(template=row, catalog=catalog, message=''))
             
-            TranslationMsg.objects.bulk_create(entries)
+                TranslationMsg.objects.bulk_create(entries)
             
         return catalog
 

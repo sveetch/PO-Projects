@@ -23,12 +23,12 @@
     
     <hr>
     <h3>{% trans "Messages to translate" %} ({{ project.templatemsg_set.count }})</h3>
-    <ul class="disc">{% for item in project.templatemsg_set.all %}
+    <ol>{% for item in project.templatemsg_set.all %}
         <li>
             <blockquote>
                 <p>{{ item.message|safe }}
                 {% comment %}<cite>{{ item.locations }}</cite>{% endcomment %}</p>
             </blockquote>
         </li>
-    {% endfor %}</ul>
+    {% endfor %}</ol>
 {% endblock %}

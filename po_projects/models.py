@@ -6,19 +6,9 @@ Models for po_projects
 > Project
     |
     |____> TemplateMsg
-    |____> TemplateMsg
-    |____> TemplateMsg
     |
-    |____> Catalog (fr)
+    |____> Catalog
             |
-            |___> TranslationMsg
-            |___> TranslationMsg
-            |___> TranslationMsg
-    |
-    |____> Catalog (zh_hk)
-            |
-            |___> TranslationMsg
-            |___> TranslationMsg
             |___> TranslationMsg
 
 """
@@ -72,6 +62,12 @@ class Catalog(models.Model):
         l = Locale.parse(self.locale)
         return l.english_name
 
+    def count_empty_translations(self):
+        return self.translationmsg_set.filter(message="").count()
+
+    def count_fuzzy_translations(self):
+        return self.translationmsg_set.filter(fuzzy=True).count()
+
     class Meta:
         verbose_name = _('catalog')
         verbose_name_plural = _('catalogs')
@@ -83,7 +79,7 @@ class TranslationMsg(models.Model):
     template = models.ForeignKey(TemplateMsg, verbose_name=_('row source'), blank=False)
     catalog = models.ForeignKey(Catalog, verbose_name=_('catalog'), blank=False)
     message = models.TextField(_('message'), blank=True)
-    # TODO: add fuzzy boolean field
+    fuzzy = models.BooleanField(_('fuzzy'), default=False, blank=True)
 
     def __unicode__(self):
         return self.message

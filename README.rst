@@ -18,6 +18,9 @@ Actually we have
 For beta staging this should implement
 ======================================
 
+* Manage fuzzy mode for translations;
+* Form to import a catalog (PO) to update a catalog;
+* Command line (or/and view ?) to import a locale dir as a zip file to update a project;
 * Rich editor usage (with colored syntax) on text edit;
 * Better model admin;
 * Permission restriction;

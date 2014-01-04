@@ -2,4 +2,4 @@
 """
 Django application to manage PO files for project translations
 """
-__version__ = '0.1.6'
+__version__ = '0.1.7'

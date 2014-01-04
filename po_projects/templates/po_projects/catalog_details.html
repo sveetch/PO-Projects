@@ -11,7 +11,7 @@
     
     <hr>
     <h3>{% trans "Messages" %}</h3>
-    <p>There is {{ project.templatemsg_set.count }} messages in the catalog</p>
+    <p>There is {{ catalog.translationmsg_set.count }} messages in the catalog, {{ catalog.count_empty_translations }} are empty and {{ catalog.count_fuzzy_translations }} are fuzzy.</p> 
     
     <p class="text-right">
         <a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Download PO" %}</a>
