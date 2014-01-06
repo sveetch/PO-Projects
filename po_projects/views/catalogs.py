@@ -135,8 +135,10 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
         
         for entry in self.object.translationmsg_set.all().order_by('id'):
             locations = [tuple(item) for item in json.loads(entry.template.locations)]
-            print type(entry.template.flags), ":", entry.template.flags
-            forged_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=entry.template.flags)
+            flags = set([]) # TODO: Temporary for dev with old malformed POT, remove it fast !
+            if entry.template.flags:
+                flags = set(json.loads(entry.template.flags))
+            forged_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=flags)
             
         fpw = StringIO.StringIO()
         write_po(fpw, forged_catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)

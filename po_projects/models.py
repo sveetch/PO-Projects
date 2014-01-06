@@ -80,6 +80,8 @@ class TranslationMsg(models.Model):
     catalog = models.ForeignKey(Catalog, verbose_name=_('catalog'), blank=False)
     message = models.TextField(_('message'), blank=True)
     fuzzy = models.BooleanField(_('fuzzy'), default=False, blank=True)
+    pluralizable = models.BooleanField(_('pluralizable'), default=False, blank=True)
+    python_format = models.BooleanField(_('python_format'), default=False, blank=True)
 
     def __unicode__(self):
         return self.message

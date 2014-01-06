@@ -14,11 +14,11 @@ Actually we have
 * View to create new project translation and edit them;
 * View to export project translations as PO files;
 * View to export an archive (zip/tarball) of all translations as PO files from a project;
+* Manage fuzzy mode for translations;
 
 For beta staging this should implement
 ======================================
 
-* Manage fuzzy mode for translations;
 * Form to import a catalog (PO) to update a catalog;
 * Command line (or/and view ?) to import a locale dir as a zip file to update a project;
 * Rich editor usage (with colored syntax) on text edit;

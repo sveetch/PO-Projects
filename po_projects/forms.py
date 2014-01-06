@@ -63,9 +63,7 @@ class ProjectForm(forms.ModelForm):
             entries = []
             for message in self.uploaded_catalog:
                 if message.id:
-                    flags = message.flags
-                    if flags == set([]):
-                        flags = ''
+                    flags = json.dumps(list(message.flags))
                     entries.append(TemplateMsg(project=project, message=message.id, locations=json.dumps(message.locations), flags=flags))
                 
             TemplateMsg.objects.bulk_create(entries)
@@ -157,13 +155,12 @@ class CatalogUpdateForm(CatalogForm):
             uploaded_entries = []
             for message in self.uploaded_catalog:
                 if message.id:
-                    flags = message.flags
-                    fuzzy = 'fuzzy' in flags
-                    exists = message.id in current_messages
-                    # TODO: flag python-string
                     # Update message if allready exist in database and if different from the source
-                    if exists and message.string != current_messages[message.id].message:
+                    if message.id in current_messages and message.string != current_messages[message.id].message:
                         current_messages[message.id].message = message.string
+                        current_messages[message.id].fuzzy = message.fuzzy
+                        current_messages[message.id].pluralizable = message.pluralizable
+                        current_messages[message.id].python_format = message.python_format
                         current_messages[message.id].save()
         
         return catalog

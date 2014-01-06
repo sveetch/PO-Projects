@@ -14,6 +14,7 @@ from django.conf import settings
 
 from po_projects.models import Project, Catalog
 
+POT_ARCHIVE_PATH = "locale/messages.pot"
 PO_ARCHIVE_PATH = "locale/{locale}/LC_MESSAGES/messages.po"
 
 def po_project_export(project_slug, archive_fileobj):
@@ -21,7 +22,8 @@ def po_project_export(project_slug, archive_fileobj):
     Export all catalogs from a project into PO files with the good directory 
     structure
     
-    TODO: accept a project slug OR a project instance (to avoid to get it again from database)
+    TODO: * Missing POT file !
+          * accept a project slug OR a project instance (to avoid to get it again from database)
     """
     #print "Project :", project_slug
     project = Project.objects.get(slug=project_slug)
@@ -43,7 +45,8 @@ def po_project_export(project_slug, archive_fileobj):
         # Add its entries
         for entry in catalog.translationmsg_set.all().order_by('id'):
             locations = [tuple(item) for item in json.loads(entry.template.locations)]
-            babel_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=entry.template.flags)
+            flags = set(json.loads(entry.template.flags))
+            babel_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=flags)
         # Write it to a buffer string
         catalog_file = StringIO()
         write_po(catalog_file, babel_catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)
