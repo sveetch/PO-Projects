@@ -19,12 +19,20 @@ from babel.messages.pofile import read_po
 
 from po_projects.models import Project, TemplateMsg, Catalog, TranslationMsg
 
+
+class SourceTextField(UneditableField):
+    """
+    Layout object for rendering template field as simple html text
+    """
+    template = "po_projects/input_as_text.html"
+
+
 class ProjectForm(forms.ModelForm):
     """Project Form"""
-    po_file = forms.FileField(label=_('PO File'), required=True, help_text='Upload a valid PO file to initialize project strings to translate')
+    po_file = forms.FileField(label=_('POT File'), required=True, help_text='Upload a valid POT file to initialize project strings to translate')
     
     def __init__(self, author=None, *args, **kwargs):
-        self.catalog = None
+        self.uploaded_catalog = None
         self.catalog_entries = []
         
         self.helper = FormHelper()
@@ -37,9 +45,9 @@ class ProjectForm(forms.ModelForm):
         data = self.cleaned_data['po_file']
         if data:
             try:
-                self.catalog = read_po(data, ignore_obsolete=True)
+                self.uploaded_catalog = read_po(data, ignore_obsolete=True)
             except:
-                raise forms.ValidationError("Your file does not seem to be a valid PO file")
+                raise forms.ValidationError("Your file does not seem to be a valid POT file")
 
         return data
 
@@ -48,12 +56,12 @@ class ProjectForm(forms.ModelForm):
         project.version = "0.1.0"
         
         if commit:
-            project.header_comment = self.catalog.header_comment
-            project.mime_headers = json.dumps(dict(self.catalog.mime_headers))
+            project.header_comment = self.uploaded_catalog.header_comment
+            project.mime_headers = json.dumps(dict(self.uploaded_catalog.mime_headers))
             project.save()
             
             entries = []
-            for message in self.catalog:
+            for message in self.uploaded_catalog:
                 if message.id:
                     flags = message.flags
                     if flags == set([]):
@@ -68,8 +76,9 @@ class ProjectForm(forms.ModelForm):
         model = Project
         exclude = ('version', 'header_comment', 'mime_headers')
 
+
 class CatalogForm(forms.ModelForm):
-    """Catalog Form"""
+    """Catalog base Form"""
     def __init__(self, project=None, *args, **kwargs):
         self.project = project
         self.fill_messages = not(kwargs.get('instance'))
@@ -117,11 +126,48 @@ class CatalogForm(forms.ModelForm):
         model = Catalog
         exclude = ('project', 'header_comment', 'mime_headers')
 
-class SourceTextField(UneditableField):
-    """
-    Layout object for rendering template field as simple html text
-    """
-    template = "po_projects/input_as_text.html"
+
+class CatalogUpdateForm(CatalogForm):
+    """Catalog update Form"""
+    po_file = forms.FileField(label=_('PO File'), required=False, help_text='Upload a valid PO file to update catalog messages, it will only update allready existing messages from the template, it does not add new message or remove existing messages. Be careful this will overwrite previous translations.')
+    
+    def __init__(self, project=None, *args, **kwargs):
+        self.fill_messages = False # Never re-fill catalog with translation from template
+        self.uploaded_catalog = None
+        
+        super(CatalogUpdateForm, self).__init__(project, *args, **kwargs)
+
+    def clean_po_file(self):
+        data = self.cleaned_data['po_file']
+        if data:
+            try:
+                self.uploaded_catalog = read_po(data, ignore_obsolete=True)
+            except:
+                raise forms.ValidationError("Your file does not seem to be a valid PO file")
+
+        return data
+
+    def save(self, commit=True):
+        catalog = super(CatalogUpdateForm, self).save(commit=commit)
+        
+        # Get all allready saved messages
+        current_messages = dict([(item.template.message, item) for item in catalog.translationmsg_set.select_related('template').all()])
+        
+        if self.uploaded_catalog:
+            uploaded_entries = []
+            for message in self.uploaded_catalog:
+                if message.id:
+                    flags = message.flags
+                    fuzzy = 'fuzzy' in flags
+                    exists = message.id in current_messages
+                    # TODO: flag python-string
+                    # Update message if allready exist in database and if different from the source
+                    if exists and message.string != current_messages[message.id].message:
+                        current_messages[message.id].message = message.string
+                        current_messages[message.id].save()
+        
+        return catalog
+
 
 class TranslationMsgForm(forms.ModelForm):
     """Translation Form"""
@@ -135,6 +181,7 @@ class TranslationMsgForm(forms.ModelForm):
                     css_class='small-6'
                 ),
                 Column(
+                    'fuzzy',
                     'message',
                     css_class='small-6'
                 ),

@@ -21,7 +21,7 @@ from babel.messages.pofile import read_po, write_po
 from babel.messages.catalog import Catalog as BabelCatalog
 
 from po_projects.models import Project, TemplateMsg, Catalog, TranslationMsg
-from po_projects.forms import ProjectForm, CatalogForm, TranslationMsgForm
+from po_projects.forms import ProjectForm, CatalogUpdateForm, TranslationMsgForm
 from po_projects.utils import DownloadMixin
 
 
@@ -31,7 +31,7 @@ class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
     """
     model = Catalog
     template_name = "po_projects/catalog_details.html"
-    form_class = CatalogForm
+    form_class = CatalogUpdateForm
 
     def get(self, request, *args, **kwargs):
         self.project = self.get_project()
@@ -68,7 +68,9 @@ class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
 
 def CatalogMessagesFormView(request, slug=None, locale=None):
     """
-    Implemented without CBV until i find HOW to do it
+    Form view to edit messages from a catalog
+    
+    Implemented without CBV until i find HOW to do it with formset usage
     """
     template_name = "po_projects/catalog_messages_form.html"
     
@@ -77,7 +79,7 @@ def CatalogMessagesFormView(request, slug=None, locale=None):
     
     formset_queryset = TranslationMsg.objects.select_related('template').filter(catalog=catalog)
     
-    TranslationMsgFormSet = modelformset_factory(TranslationMsg, form=TranslationMsgForm, fields=('template','message',), extra=0)
+    TranslationMsgFormSet = modelformset_factory(TranslationMsg, form=TranslationMsgForm, fields=('template','fuzzy','message',), extra=0)
     
     formset = TranslationMsgFormSet(request.POST or None, queryset=formset_queryset)
     
@@ -133,6 +135,7 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
         
         for entry in self.object.translationmsg_set.all().order_by('id'):
             locations = [tuple(item) for item in json.loads(entry.template.locations)]
+            print type(entry.template.flags), ":", entry.template.flags
             forged_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=entry.template.flags)
             
         fpw = StringIO.StringIO()

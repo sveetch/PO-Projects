@@ -5,7 +5,7 @@ Principle is to have a frontend board to create new PO project from a POT file t
 then add it and manage language translation and finally export all these PO to include it 
 in your app (django or another).
 
-**This is in alpha staging, models are not stable yet, there is no documentation and frontend is far from usable, you've be warned!**
+**This is in beta staging, models are not stable yet, there is no documentation and frontend is far from usable, you've be warned!**
 
 Actually we have
 ================
