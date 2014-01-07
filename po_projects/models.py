@@ -12,7 +12,11 @@ Models for po_projects
             |___> TranslationMsg
 
 """
+import json
+
 from babel.core import Locale
+from babel.messages.catalog import Catalog as BabelCatalog
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -29,6 +33,22 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_babel_template(self):
+        """
+        Return a babel template catalog suitable for a POT file
+        """
+        forged_catalog = BabelCatalog(
+            header_comment=self.header_comment,
+            project=self.name,
+            version=self.version
+        )
+        
+        for entry in self.templatemsg_set.all().order_by('id'):
+            print "foo"
+            forged_catalog.add(entry.message, string=None, locations=entry.get_locations_set(), flags=entry.get_flags_set())
+        
+        return forged_catalog
+
     class Meta:
         verbose_name = _('project')
         verbose_name_plural = _('projects')
@@ -44,6 +64,15 @@ class TemplateMsg(models.Model):
 
     def __unicode__(self):
         return self.message
+
+    def get_locations_set(self):
+        print self.locations, type(self.locations)
+        print json.loads(self.locations)
+        print
+        return set(json.loads(self.locations))
+
+    def get_flags_set(self):
+        return set(json.loads(self.flags))
 
     class Meta:
         verbose_name = _('template message')
@@ -68,6 +97,23 @@ class Catalog(models.Model):
     def count_fuzzy_translations(self):
         return self.translationmsg_set.filter(fuzzy=True).count()
 
+    def get_babel_catalog(self):
+        """
+        Return a babel catalog suitable for a PO file
+        """
+        forged_catalog = BabelCatalog(
+            locale=self.locale, 
+            header_comment=self.header_comment,
+            project=self.project.name,
+            version=self.project.version
+        )
+        
+        for entry in self.translationmsg_set.all().order_by('id'):
+            locations = [tuple(item) for item in json.loads(entry.template.locations)]
+            forged_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=entry.get_flags())
+        
+        return forged_catalog
+
     class Meta:
         verbose_name = _('catalog')
         verbose_name_plural = _('catalogs')
@@ -85,6 +131,13 @@ class TranslationMsg(models.Model):
 
     def __unicode__(self):
         return self.message
+
+    def get_flags(self):
+        flags = []
+        if self.fuzzy: flags.append('fuzzy')
+        #if self.pluralizable: flags.append('pluralizable')
+        if self.python_format: flags.append('python-format')
+        return set(flags)
 
     class Meta:
         verbose_name = _('translation message')

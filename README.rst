@@ -20,8 +20,7 @@ For beta staging this should implement
 ======================================
 
 * Form to import a catalog (PO) to update a catalog;
-* Command line (or/and view ?) to import a locale dir as a zip file to update a project;
-* Rich editor usage (with colored syntax) on text edit;
+* Better global ergonomy;
 * Better model admin;
 * Permission restriction;
 * User authoring to know who has done what;

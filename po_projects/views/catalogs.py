@@ -126,19 +126,7 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
         return self.filename_format.format(**context)
     
     def get_content(self, context):
-        forged_catalog = BabelCatalog(
-            locale=self.object.locale, 
-            header_comment=self.object.header_comment,
-            project=self.project.name,
-            version=self.project.version
-        )
-        
-        for entry in self.object.translationmsg_set.all().order_by('id'):
-            locations = [tuple(item) for item in json.loads(entry.template.locations)]
-            flags = set([]) # TODO: Temporary for dev with old malformed POT, remove it fast !
-            if entry.template.flags:
-                flags = set(json.loads(entry.template.flags))
-            forged_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=flags)
+        forged_catalog = self.object.get_babel_catalog()
             
         fpw = StringIO.StringIO()
         write_po(fpw, forged_catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)

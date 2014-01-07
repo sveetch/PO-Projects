@@ -126,5 +126,4 @@ class ProjectExportView(LoginRequiredMixin, DownloadMixin, generic.View):
         # TODO: give directly the project instance not its slug
         po_project_export(self.object.slug, archive_file)
         
-        #archive_file.close()
         return archive_file.getvalue()

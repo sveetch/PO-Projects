@@ -31,22 +31,19 @@ def po_project_export(project_slug, archive_fileobj):
     
     archive_files = []
     
+    # Template catalog POT file
+    template_file = StringIO()
+    write_po(template_file, project.get_babel_template(), sort_by_file=False, ignore_obsolete=True, include_previous=False)
+    template_file.seek(0)
+    archive_files.append( (POT_ARCHIVE_PATH, template_file) )
+    
+    # Catalog PO files
     for catalog in project.catalog_set.all():
         archived_path = PO_ARCHIVE_PATH.format(locale=catalog.locale)
         #print " * Catalog:", catalog.locale
         #print "     - Path :", archived_path
         # Open a new catalog
-        babel_catalog = BabelCatalog(
-            locale=catalog.locale, 
-            header_comment=catalog.header_comment,
-            project=project.name,
-            version=project.version
-        )
-        # Add its entries
-        for entry in catalog.translationmsg_set.all().order_by('id'):
-            locations = [tuple(item) for item in json.loads(entry.template.locations)]
-            flags = set(json.loads(entry.template.flags))
-            babel_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=flags)
+        babel_catalog = catalog.get_babel_catalog()
         # Write it to a buffer string
         catalog_file = StringIO()
         write_po(catalog_file, babel_catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)
@@ -55,7 +52,6 @@ def po_project_export(project_slug, archive_fileobj):
         archive_files.append( (archived_path, catalog_file) )
     
     # Open and fill tarball archive
-    # TODO: restore fileobj usage
     archive = tarfile.open("{0}.tar.gz".format(project.slug), mode="w:gz", fileobj=archive_fileobj)
     mtime = time.time()
     

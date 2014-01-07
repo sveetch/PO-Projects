@@ -64,7 +64,8 @@ class ProjectForm(forms.ModelForm):
             for message in self.uploaded_catalog:
                 if message.id:
                     flags = json.dumps(list(message.flags))
-                    entries.append(TemplateMsg(project=project, message=message.id, locations=json.dumps(message.locations), flags=flags))
+                    locations = json.dumps(message.locations)
+                    entries.append(TemplateMsg(project=project, message=message.id, locations=locations, flags=flags))
                 
             TemplateMsg.objects.bulk_create(entries)
             
