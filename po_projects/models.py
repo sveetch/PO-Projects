@@ -44,7 +44,6 @@ class Project(models.Model):
         )
         
         for entry in self.templatemsg_set.all().order_by('id'):
-            print "foo"
             forged_catalog.add(entry.message, string=None, locations=entry.get_locations_set(), flags=entry.get_flags_set())
         
         return forged_catalog
@@ -66,10 +65,7 @@ class TemplateMsg(models.Model):
         return self.message
 
     def get_locations_set(self):
-        print self.locations, type(self.locations)
-        print json.loads(self.locations)
-        print
-        return set(json.loads(self.locations))
+        return set([tuple(item) for item in json.loads(self.locations)])
 
     def get_flags_set(self):
         return set(json.loads(self.flags))
