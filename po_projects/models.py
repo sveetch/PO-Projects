@@ -65,9 +65,11 @@ class TemplateMsg(models.Model):
         return self.message
 
     def get_locations_set(self):
+        """Return a set from stored locations in JSON"""
         return set([tuple(item) for item in json.loads(self.locations)])
 
     def get_flags_set(self):
+        """Return a set from stored flags in JSON"""
         return set(json.loads(self.flags))
 
     class Meta:
@@ -88,9 +90,11 @@ class Catalog(models.Model):
         return l.english_name
 
     def count_empty_translations(self):
+        """Return a count of translations with an empty message"""
         return self.translationmsg_set.filter(message="").count()
 
     def count_fuzzy_translations(self):
+        """Return a count of translations with message marked as fuzzy"""
         return self.translationmsg_set.filter(fuzzy=True).count()
 
     def get_babel_catalog(self):
@@ -129,9 +133,9 @@ class TranslationMsg(models.Model):
         return self.message
 
     def get_flags(self):
+        """Return a set of flags computed from some model attributes"""
         flags = []
         if self.fuzzy: flags.append('fuzzy')
-        #if self.pluralizable: flags.append('pluralizable')
         if self.python_format: flags.append('python-format')
         return set(flags)
 
