@@ -5,9 +5,11 @@ Models for po_projects
 
 > Project
     |
-    |____> TemplateMsg
-    |
-    |____> Catalog
+    |_> ProjectVersion
+        |
+        |_> TemplateMsg
+        |
+        |_> Catalog
             |
             |___> TranslationMsg
 
@@ -22,16 +24,29 @@ from django.utils.translation import ugettext_lazy as _
 
 class Project(models.Model):
     """
-    Project contains catalog and template catalog
+    Project container
     """
     name = models.CharField(_('name'), max_length=150)
     slug = models.SlugField(_('slug'), unique=True, max_length=75)
-    version = models.CharField(_('version'), max_length=15)
-    header_comment = models.TextField(_('header comment'))
-    mime_headers = models.TextField(_('mime headers'))
 
     def __unicode__(self):
         return self.name
+
+    def get_current_version(self):
+        return self.projectversion_set.all().order_by('version')[0:1]
+
+    class Meta:
+        verbose_name = _('project')
+        verbose_name_plural = _('projects')
+
+class ProjectVersion(models.Model):
+    """
+    Project version is what contains catalogs and template catalogs
+    """
+    project = models.ForeignKey(Project, verbose_name=_('project'), blank=False)
+    version = models.CharField(_('version'), max_length=15)
+    header_comment = models.TextField(_('header comment'))
+    mime_headers = models.TextField(_('mime headers'))
 
     def get_babel_template(self):
         """
@@ -39,7 +54,7 @@ class Project(models.Model):
         """
         forged_catalog = BabelCatalog(
             header_comment=self.header_comment,
-            project=self.name,
+            project=self.project.name,
             version=self.version
         )
         
@@ -48,15 +63,18 @@ class Project(models.Model):
         
         return forged_catalog
 
+    def __unicode__(self):
+        return "{name} v{version}".format(name=self.project.name, version=self.version)
+
     class Meta:
-        verbose_name = _('project')
-        verbose_name_plural = _('projects')
+        verbose_name = _('project version')
+        verbose_name_plural = _('projects versions')
 
 class TemplateMsg(models.Model):
     """
     Template catalog item, equivalent to a msg from a POT file
     """
-    project = models.ForeignKey(Project, verbose_name=_('project'), blank=False)
+    project_version = models.ForeignKey(ProjectVersion, verbose_name=_('project version'), blank=False)
     message = models.TextField(_('message id'), blank=False)
     locations = models.TextField(_('locations'))
     flags = models.TextField(_('flags'))
@@ -80,7 +98,7 @@ class Catalog(models.Model):
     """
     Language catalog for a project, the PO file equivalent
     """
-    project = models.ForeignKey(Project, verbose_name=_('project'), blank=False)
+    project_version = models.ForeignKey(ProjectVersion, verbose_name=_('project version'), blank=False)
     locale = models.CharField(_('locale'), max_length=50, blank=False)
     header_comment = models.TextField(_('header comment'))
     mime_headers = models.TextField(_('mime headers'))
@@ -104,8 +122,8 @@ class Catalog(models.Model):
         forged_catalog = BabelCatalog(
             locale=self.locale, 
             header_comment=self.header_comment,
-            project=self.project.name,
-            version=self.project.version
+            project=self.project_version.name,
+            version=self.project_version.version
         )
         
         for entry in self.translationmsg_set.all().order_by('id'):
