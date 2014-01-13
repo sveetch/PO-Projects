@@ -22,8 +22,7 @@ def po_project_export(project_slug, archive_fileobj):
     Export all catalogs from a project into PO files with the good directory 
     structure
     
-    TODO: * Missing POT file !
-          * accept a project slug OR a project instance (to avoid to get it again from database)
+    TODO: * accept a project slug OR a project instance (to avoid to get it again from database)
     """
     #print "Project :", project_slug
     project = Project.objects.get(slug=project_slug)

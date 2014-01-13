@@ -16,6 +16,7 @@
     {% endfor %}</ul>
     
     <a href="{% url 'po_projects:project-download' slug=project.slug %}" class="button">{% trans "Download archive" %}</a>
+    <a href="{% url 'po_projects:project-update' slug=project.slug %}" class="button">{% trans "Update" %}</a>
     
     <hr>
     <h4>{% trans "Add new" %}</h4>

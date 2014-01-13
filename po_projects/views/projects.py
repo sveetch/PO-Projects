@@ -22,7 +22,7 @@ from babel.messages.pofile import read_po, write_po
 from babel.messages.catalog import Catalog as BabelCatalog
 
 from po_projects.models import Project, TemplateMsg, Catalog, TranslationMsg
-from po_projects.forms import ProjectForm, CatalogForm, TranslationMsgForm
+from po_projects.forms import ProjectForm, ProjectUpdateForm, CatalogForm, TranslationMsgForm
 from po_projects.utils import DownloadMixin
 from po_projects.dump import po_project_export
 
@@ -127,3 +127,40 @@ class ProjectExportView(LoginRequiredMixin, DownloadMixin, generic.View):
         po_project_export(self.object.slug, archive_file)
         
         return archive_file.getvalue()
+
+
+class ProjectUpdate(LoginRequiredMixin, generic.UpdateView):
+    """
+    Form view to update project template and catalogs from a POT file
+    """
+    model = Project
+    template_name = "po_projects/project_form.html"
+    form_class = ProjectUpdateForm
+
+    def get(self, request, *args, **kwargs):
+        self.project = self.get_project(**kwargs)
+        return super(ProjectUpdate, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.project = self.get_project(**kwargs)
+        return super(ProjectUpdate, self).post(request, *args, **kwargs)
+
+    def get_project(self, **kwargs):
+        return get_object_or_404(Project, slug=kwargs['slug'])
+        
+    def get_context_data(self, **kwargs):
+        context = super(ProjectUpdate, self).get_context_data(**kwargs)
+        context.update({
+            'project': self.project,
+        })
+        return context
+
+    def get_success_url(self):
+        return reverse('po_projects:project-update', args=[self.project.slug])
+
+    def get_form_kwargs(self):
+        kwargs = super(ProjectUpdate, self).get_form_kwargs()
+        kwargs.update({
+            'author': self.request.user,
+        })
+        return kwargs

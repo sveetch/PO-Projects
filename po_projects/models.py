@@ -57,7 +57,7 @@ class TemplateMsg(models.Model):
     Template catalog item, equivalent to a msg from a POT file
     """
     project = models.ForeignKey(Project, verbose_name=_('project'), blank=False)
-    message = models.TextField(_('message'), blank=False)
+    message = models.TextField(_('message id'), blank=False)
     locations = models.TextField(_('locations'))
     flags = models.TextField(_('flags'))
 

@@ -27,3 +27,19 @@ For beta staging this should implement
 * External API access to get PO files or global project archive from external tools 
   (like Optimus or a Django app from an external site) ?
 * Restrict external API access
+
+External API access
+===================
+
+We actually need of two clients : 
+
+* One for Django webapp, shipped as a Django app that only exposes a command line tool, no needs of model;
+* One for Optimus, allready shipped as a new command line tool;
+
+The access to the API need to be protected and restricted to avoid that anyone can download and/or edit project translations.
+
+API actions should be :
+
+* Export project, this will send a tarball containing the locale directory to overwrite the one in the destination project (in the django or optimus project, not the translation project stored in Po-Projects);
+* Receiving new POT file to update a project template and catalogs;
+

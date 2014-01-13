@@ -27,6 +27,19 @@ class SourceTextField(UneditableField):
     template = "po_projects/input_as_text.html"
 
 
+def create_templatemsgs(project, pot_catalog, commit=True):
+    entries = []
+    for message in self.uploaded_catalog:
+        if message.id:
+            flags = json.dumps(list(message.flags))
+            locations = json.dumps(message.locations)
+            entries.append(TemplateMsg(project=project, message=message.id, locations=locations, flags=flags))
+        
+    if commit:
+        TemplateMsg.objects.bulk_create(entries)
+        
+    return entries
+
 class ProjectForm(forms.ModelForm):
     """Project Form"""
     po_file = forms.FileField(label=_('POT File'), required=True, help_text='Upload a valid POT file to initialize project strings to translate')
@@ -60,20 +73,72 @@ class ProjectForm(forms.ModelForm):
             project.mime_headers = json.dumps(dict(self.uploaded_catalog.mime_headers))
             project.save()
             
-            entries = []
-            for message in self.uploaded_catalog:
-                if message.id:
-                    flags = json.dumps(list(message.flags))
-                    locations = json.dumps(message.locations)
-                    entries.append(TemplateMsg(project=project, message=message.id, locations=locations, flags=flags))
-                
-            TemplateMsg.objects.bulk_create(entries)
+            create_templatemsgs(project, pot_catalog)
             
         return project
 
     class Meta:
         model = Project
         exclude = ('version', 'header_comment', 'mime_headers')
+
+class ProjectUpdateForm(ProjectForm):
+    """Project Form for update"""
+    def __init__(self, author=None, *args, **kwargs):
+        super(ProjectUpdateForm, self).__init__(*args, **kwargs)
+        
+        self.fields['po_file'].required = False
+
+    def save(self, commit=True):
+        project = super(ProjectForm, self).save(commit=False)
+        #project.version = "0.1.0" # auto increment ?
+        
+        if commit:
+            if self.uploaded_catalog:
+                # TODO: For versioning, the current catalog has to be stored (as a PO file for ease) before update
+                project.header_comment = self.uploaded_catalog.header_comment
+                project.mime_headers = json.dumps(dict(self.uploaded_catalog.mime_headers))
+            project.save()
+            
+            if self.uploaded_catalog:
+                """
+                Broken by design
+                
+                Babel is not capable to output diff for changes on POT file which is 
+                needed to cleanly update Catalogs from Template update, therefore the 
+                actual models can't handle some stuff like fuzzy flag on TranslationMsg 
+                items from updated TemplateMsg items.
+                """
+                # Dict map from project templatemsg_set indexed on message id
+                templatemsg_map = dict([(item.message, item) for item in project.templatemsg_set.all()])
+                # Dict map for knowed catalogs as PO files
+                knowed_catalogs = dict([(item.locale, item.get_babel_catalog()) for item in project.catalog_set.all()])
+                
+                # Clean previous catalog
+                for item in project.catalog_set.all():
+                    #item.delete()
+                    pass
+                
+                # Clean previous template items
+                for item in project.templatemsg_set.all():
+                    #item.delete()
+                    pass
+                
+                new_template = project.get_babel_template()
+                new_template.update(self.uploaded_catalog)
+                
+                created_templatemsgs = create_templatemsgs(project, pot_catalog, commit=False)
+                # TODO: Rebuild catalogs, assure link between translationmsg and templatemsg
+                for item in knowed_catalogs:
+                    pass
+                
+                        # - else if not in dict map, this is a new templatemsg to add, so pop it and add it translationmsg's for its catalogs
+                # For remaining dict map items, they are obsolete, remove them from templatemsg (this should also remove its translationmsg)
+                print
+                print "Remaining template"
+                for k,v in templatemsg_map.items():
+                    print "-", k
+            
+        return project
 
 
 class CatalogForm(forms.ModelForm):
