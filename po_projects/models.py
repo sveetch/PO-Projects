@@ -122,7 +122,7 @@ class Catalog(models.Model):
         forged_catalog = BabelCatalog(
             locale=self.locale, 
             header_comment=self.header_comment,
-            project=self.project_version.name,
+            project=self.project_version.project.name,
             version=self.project_version.version
         )
         

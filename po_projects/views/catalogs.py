@@ -74,7 +74,7 @@ class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
         return kwargs
 
 
-def CatalogMessagesFormView(request, slug=None, locale=None):
+def CatalogMessagesFormView(request, slug=None, version=None, locale=None):
     """
     Form view to edit messages from a catalog
     
@@ -83,7 +83,11 @@ def CatalogMessagesFormView(request, slug=None, locale=None):
     template_name = "po_projects/catalog_messages_form.html"
     
     project = get_object_or_404(Project, slug=slug)
-    catalog = get_object_or_404(Catalog, project=project, locale=locale)
+    if version is not None:
+        project_version = get_object_or_404(ProjectVersion, project=project, version=version)
+    else:
+        project_version = project.get_current_version()
+    catalog = get_object_or_404(Catalog, project_version=project_version, locale=locale)
     
     formset_queryset = TranslationMsg.objects.select_related('template').filter(catalog=catalog)
     
@@ -96,6 +100,7 @@ def CatalogMessagesFormView(request, slug=None, locale=None):
     
     extra_context = {
         "project": project,
+        "project_version": project_version,
         "catalog": catalog,
         "formset": formset
     }
@@ -111,19 +116,26 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
 
     def get(self, request, *args, **kwargs):
         self.project = self.get_project()
+        self.project_version = self.get_project_version()
         self.object = self.get_object()
         return super(CatalogMessagesExportView, self).get(request, *args, **kwargs)
     
     def get_project(self):
         return get_object_or_404(Project, slug=self.kwargs['slug'])
 
+    def get_project_version(self):
+        if "version" in self.kwargs:
+            return get_object_or_404(ProjectVersion, project=self.project, version=self.kwargs['version'])
+        return self.project.get_current_version()
+
     def get_object(self):
-        return get_object_or_404(Catalog, project=self.project, locale=self.kwargs['locale'])
+        return get_object_or_404(Catalog, project_version=self.project_version, locale=self.kwargs['locale'])
         
     def get_context_data(self, **kwargs):
         context = super(CatalogMessagesExportView, self).get_context_data(**kwargs)
         context.update({
             'project': self.project,
+            'project_version': self.project_version,
             'catalog': self.object,
             'locale_name': self.object.locale,
             'timestamp': self.get_filename_timestamp(),
