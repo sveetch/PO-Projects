@@ -33,7 +33,7 @@ class Project(models.Model):
         return self.name
 
     def get_current_version(self):
-        return self.projectversion_set.all().order_by('version')[0:1]
+        return self.projectversion_set.all().order_by('version')[0:1][0]
 
     class Meta:
         verbose_name = _('project')

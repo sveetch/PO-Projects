@@ -21,7 +21,7 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from babel.messages.pofile import read_po, write_po
 from babel.messages.catalog import Catalog as BabelCatalog
 
-from po_projects.models import Project, TemplateMsg, Catalog, TranslationMsg
+from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
 from po_projects.forms import ProjectForm, ProjectUpdateForm, CatalogForm, TranslationMsgForm
 from po_projects.utils import DownloadMixin
 from po_projects.dump import po_project_export
@@ -66,20 +66,28 @@ class ProjectDetails(LoginRequiredMixin, generic.CreateView):
     form_class = CatalogForm
 
     def get(self, request, *args, **kwargs):
-        self.project = self.get_project(**kwargs)
+        self.project = self.get_project()
+        self.project_version = self.get_project_version()
         return super(ProjectDetails, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        self.project = self.get_project(**kwargs)
+        self.project = self.get_project()
+        self.project_version = self.get_project_version()
         return super(ProjectDetails, self).post(request, *args, **kwargs)
 
-    def get_project(self, **kwargs):
-        return get_object_or_404(Project, slug=kwargs['slug'])
+    def get_project(self):
+        return get_object_or_404(Project, slug=self.kwargs['slug'])
+
+    def get_project_version(self):
+        if "version" in self.kwargs:
+            return get_object_or_404(ProjectVersion, project=self.project, version=self.kwargs['version'])
+        return self.project.get_current_version()
         
     def get_context_data(self, **kwargs):
         context = super(ProjectDetails, self).get_context_data(**kwargs)
         context.update({
             'project': self.project,
+            'project_version': self.project_version,
         })
         return context
 
@@ -89,7 +97,7 @@ class ProjectDetails(LoginRequiredMixin, generic.CreateView):
     def get_form_kwargs(self):
         kwargs = super(ProjectDetails, self).get_form_kwargs()
         kwargs.update({
-            'project': self.project,
+            'project_version': self.project_version,
         })
         return kwargs
 

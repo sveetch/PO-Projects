@@ -10,7 +10,7 @@
     </p>
     
     <ul class="disc">{% for item in project_list %}
-        <li><a href="{% url 'po_projects:project-details' slug=item.slug %}">{{ item.name }}</a></li>
+        <li><a href="{% url 'po_projects:project-details' slug=item.slug %}">{{ item.get_current_version }}</a></li>
     {% empty %}
     <li>There is no project yet</li>
     {% endfor %}</ul>

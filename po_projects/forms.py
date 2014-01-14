@@ -17,7 +17,7 @@ from babel import Locale
 from babel.core import UnknownLocaleError, get_locale_identifier
 from babel.messages.pofile import read_po
 
-from po_projects.models import Project, TemplateMsg, Catalog, TranslationMsg
+from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
 
 
 class SourceTextField(UneditableField):
@@ -27,15 +27,17 @@ class SourceTextField(UneditableField):
     template = "po_projects/input_as_text.html"
 
 
-def create_templatemsgs(project, pot_catalog, commit=True):
+def create_templatemsgs(project_version, pot_catalog, commit=True):
     entries = []
-    for message in self.uploaded_catalog:
+    for message in pot_catalog:
         if message.id:
+            print message.id
             flags = json.dumps(list(message.flags))
             locations = json.dumps(message.locations)
-            entries.append(TemplateMsg(project=project, message=message.id, locations=locations, flags=flags))
+            entries.append(TemplateMsg(project_version=project_version, message=message.id, locations=locations, flags=flags))
         
     if commit:
+        print "bulk_create"
         TemplateMsg.objects.bulk_create(entries)
         
     return entries
@@ -66,20 +68,21 @@ class ProjectForm(forms.ModelForm):
 
     def save(self, commit=True):
         project = super(ProjectForm, self).save(commit=False)
-        project.version = "0.1.0"
+        project.save()
         
-        if commit:
-            project.header_comment = self.uploaded_catalog.header_comment
-            project.mime_headers = json.dumps(dict(self.uploaded_catalog.mime_headers))
-            project.save()
-            
-            create_templatemsgs(project, pot_catalog)
+        # Create a the first project_version
+        project_version = project.projectversion_set.create(
+            version = "0.1.0",
+            header_comment = self.uploaded_catalog.header_comment,
+            mime_headers = json.dumps(dict(self.uploaded_catalog.mime_headers)),
+        )
+        # Create the templatemsg from the given POT file
+        create_templatemsgs(project_version, self.uploaded_catalog)
             
         return project
 
     class Meta:
         model = Project
-        exclude = ('version', 'header_comment', 'mime_headers')
 
 class ProjectUpdateForm(ProjectForm):
     """Project Form for update"""
@@ -143,8 +146,8 @@ class ProjectUpdateForm(ProjectForm):
 
 class CatalogForm(forms.ModelForm):
     """Catalog base Form"""
-    def __init__(self, project=None, *args, **kwargs):
-        self.project = project
+    def __init__(self, project_version=None, *args, **kwargs):
+        self.project_version = project_version
         self.fill_messages = not(kwargs.get('instance'))
         self.helper = FormHelper()
         self.helper.form_action = '.'
@@ -169,17 +172,17 @@ class CatalogForm(forms.ModelForm):
 
     def save(self, commit=True):
         catalog = super(CatalogForm, self).save(commit=False)
-        catalog.project = self.project
+        catalog.project_version = self.project_version
         
         if commit:
-            catalog.header_comment = self.project.header_comment
-            catalog.mime_headers = self.project.mime_headers
+            catalog.header_comment = self.project_version.header_comment
+            catalog.mime_headers = self.project_version.mime_headers
             catalog.save()
             
             # Only fill catalog with template messages on the first create
             if self.fill_messages:
                 entries = []
-                for row in self.project.templatemsg_set.all():
+                for row in self.project_version.templatemsg_set.all():
                     entries.append(TranslationMsg(template=row, catalog=catalog, message=''))
             
                 TranslationMsg.objects.bulk_create(entries)
@@ -188,18 +191,18 @@ class CatalogForm(forms.ModelForm):
 
     class Meta:
         model = Catalog
-        exclude = ('project', 'header_comment', 'mime_headers')
+        exclude = ('project_version', 'header_comment', 'mime_headers')
 
 
 class CatalogUpdateForm(CatalogForm):
     """Catalog update Form"""
     po_file = forms.FileField(label=_('PO File'), required=False, help_text='Upload a valid PO file to update catalog messages, it will only update allready existing messages from the template, it does not add new message or remove existing messages. Be careful this will overwrite previous translations.')
     
-    def __init__(self, project=None, *args, **kwargs):
+    def __init__(self, project_version=None, *args, **kwargs):
         self.fill_messages = False # Never re-fill catalog with translation from template
         self.uploaded_catalog = None
         
-        super(CatalogUpdateForm, self).__init__(project, *args, **kwargs)
+        super(CatalogUpdateForm, self).__init__(project_version, *args, **kwargs)
 
     def clean_po_file(self):
         data = self.cleaned_data['po_file']
