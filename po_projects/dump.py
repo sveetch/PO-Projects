@@ -21,8 +21,6 @@ def po_project_export(project, project_version, archive_fileobj):
     """
     Export all catalogs from a project into PO files with the good directory 
     structure
-    
-    TODO: * accept a project slug OR a project instance (to avoid to get it again from database)
     """
     archive_files = []
     

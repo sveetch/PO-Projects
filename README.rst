@@ -31,7 +31,7 @@ For beta staging this should implement
 External API access
 ===================
 
-We actually need of two clients : 
+We should need of two clients : 
 
 * One for Django webapp, shipped as a Django app that only exposes a command line tool, no needs of model;
 * One for Optimus, allready shipped as a new command line tool;
