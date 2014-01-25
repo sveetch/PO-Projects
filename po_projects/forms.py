@@ -130,11 +130,11 @@ class ProjectUpdateForm(ProjectForm):
                 new_template.update(self.uploaded_catalog)
                 
                 created_templatemsgs = create_templatemsgs(project, pot_catalog, commit=False)
-                # TODO: Rebuild catalogs, assure link between translationmsg and templatemsg
+                # TODO: Rebuild catalogs and assure links between translationmsg and templatemsg
                 for item in knowed_catalogs:
                     pass
                 
-                        # - else if not in dict map, this is a new templatemsg to add, so pop it and add it translationmsg's for its catalogs
+                # - else if not in dict map, this is a new templatemsg to add, so pop it and add it translationmsg's for its catalogs
                 # For remaining dict map items, they are obsolete, remove them from templatemsg (this should also remove its translationmsg)
                 print
                 print "Remaining template"

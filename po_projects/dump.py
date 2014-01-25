@@ -17,27 +17,23 @@ from po_projects.models import Project, Catalog
 POT_ARCHIVE_PATH = "locale/messages.pot"
 PO_ARCHIVE_PATH = "locale/{locale}/LC_MESSAGES/messages.po"
 
-def po_project_export(project_slug, archive_fileobj):
+def po_project_export(project, project_version, archive_fileobj):
     """
     Export all catalogs from a project into PO files with the good directory 
     structure
     
     TODO: * accept a project slug OR a project instance (to avoid to get it again from database)
     """
-    #print "Project :", project_slug
-    project = Project.objects.get(slug=project_slug)
-    #print "- name :", project.name
-    
     archive_files = []
     
     # Template catalog POT file
     template_file = StringIO()
-    write_po(template_file, project.get_babel_template(), sort_by_file=False, ignore_obsolete=True, include_previous=False)
+    write_po(template_file, project_version.get_babel_template(), sort_by_file=False, ignore_obsolete=True, include_previous=False)
     template_file.seek(0)
     archive_files.append( (POT_ARCHIVE_PATH, template_file) )
     
     # Catalog PO files
-    for catalog in project.catalog_set.all():
+    for catalog in project_version.catalog_set.all():
         archived_path = PO_ARCHIVE_PATH.format(locale=catalog.locale)
         #print " * Catalog:", catalog.locale
         #print "     - Path :", archived_path

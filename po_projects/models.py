@@ -41,7 +41,7 @@ class Project(models.Model):
 
 class ProjectVersion(models.Model):
     """
-    Project version is what contains catalogs and template catalogs
+    Project version is what contains catalogs and template catalogs for a specific POT file version
     """
     project = models.ForeignKey(Project, verbose_name=_('project'), blank=False)
     version = models.CharField(_('version'), max_length=15)

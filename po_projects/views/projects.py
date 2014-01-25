@@ -111,10 +111,16 @@ class ProjectExportView(LoginRequiredMixin, DownloadMixin, generic.View):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+        self.project_version = self.get_project_version()
         return super(ProjectExportView, self).get(request, *args, **kwargs)
 
     def get_object(self):
         return get_object_or_404(Project, slug=self.kwargs['slug'])
+
+    def get_project_version(self):
+        if "version" in self.kwargs:
+            return get_object_or_404(ProjectVersion, project=self.object, version=self.kwargs['version'])
+        return self.object.get_current_version()
 
     def get_context_data(self, **kwargs):
         context = super(ProjectExportView, self).get_context_data(**kwargs)
@@ -131,8 +137,7 @@ class ProjectExportView(LoginRequiredMixin, DownloadMixin, generic.View):
     def get_content(self, context):
         archive_file = StringIO()
         
-        # TODO: give directly the project instance not its slug
-        po_project_export(self.object.slug, archive_file)
+        po_project_export(self.object, self.project_version, archive_file)
         
         return archive_file.getvalue()
 
