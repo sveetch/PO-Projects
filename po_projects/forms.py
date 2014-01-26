@@ -31,16 +31,16 @@ def create_templatemsgs(project_version, pot_catalog, commit=True):
     entries = []
     for message in pot_catalog:
         if message.id:
-            print message.id
+            #print message.id
             flags = json.dumps(list(message.flags))
             locations = json.dumps(message.locations)
             entries.append(TemplateMsg(project_version=project_version, message=message.id, locations=locations, flags=flags))
         
     if commit:
-        print "bulk_create"
         TemplateMsg.objects.bulk_create(entries)
         
     return entries
+
 
 class ProjectForm(forms.ModelForm):
     """Project Form"""
@@ -71,18 +71,27 @@ class ProjectForm(forms.ModelForm):
         project.save()
         
         # Create a the first project_version
+        self.create_new_version(project, "0.1.0")
+            
+        return project
+    
+    def create_new_version(self, project, version):
+        """
+        Open a new version for a project and fill it with datas from the given 
+        POT file
+        """
         project_version = project.projectversion_set.create(
-            version = "0.1.0",
+            version = version,
             header_comment = self.uploaded_catalog.header_comment,
             mime_headers = json.dumps(dict(self.uploaded_catalog.mime_headers)),
         )
-        # Create the templatemsg from the given POT file
         create_templatemsgs(project_version, self.uploaded_catalog)
-            
-        return project
+        
+        return project_version
 
     class Meta:
         model = Project
+
 
 class ProjectUpdateForm(ProjectForm):
     """Project Form for update"""
@@ -93,55 +102,47 @@ class ProjectUpdateForm(ProjectForm):
 
     def save(self, commit=True):
         project = super(ProjectForm, self).save(commit=False)
-        #project.version = "0.1.0" # auto increment ?
         
         if commit:
             if self.uploaded_catalog:
-                # TODO: For versioning, the current catalog has to be stored (as a PO file for ease) before update
-                project.header_comment = self.uploaded_catalog.header_comment
-                project.mime_headers = json.dumps(dict(self.uploaded_catalog.mime_headers))
+                previous_version = project.get_current_version()
+                current_version = self.create_new_version(project, "0.2.0")
+                self.update_catalogs(project, previous_version, current_version)
             project.save()
             
-            if self.uploaded_catalog:
-                """
-                Broken by design
-                
-                Babel is not capable to output diff for changes on POT file which is 
-                needed to cleanly update Catalogs from Template update, therefore the 
-                actual models can't handle some stuff like fuzzy flag on TranslationMsg 
-                items from updated TemplateMsg items.
-                """
-                # Dict map from project templatemsg_set indexed on message id
-                templatemsg_map = dict([(item.message, item) for item in project.templatemsg_set.all()])
-                # Dict map for knowed catalogs as PO files
-                knowed_catalogs = dict([(item.locale, item.get_babel_catalog()) for item in project.catalog_set.all()])
-                
-                # Clean previous catalog
-                for item in project.catalog_set.all():
-                    #item.delete()
-                    pass
-                
-                # Clean previous template items
-                for item in project.templatemsg_set.all():
-                    #item.delete()
-                    pass
-                
-                new_template = project.get_babel_template()
-                new_template.update(self.uploaded_catalog)
-                
-                created_templatemsgs = create_templatemsgs(project, pot_catalog, commit=False)
-                # TODO: Rebuild catalogs and assure links between translationmsg and templatemsg
-                for item in knowed_catalogs:
-                    pass
-                
-                # - else if not in dict map, this is a new templatemsg to add, so pop it and add it translationmsg's for its catalogs
-                # For remaining dict map items, they are obsolete, remove them from templatemsg (this should also remove its translationmsg)
-                print
-                print "Remaining template"
-                for k,v in templatemsg_map.items():
-                    print "-", k
-            
         return project
+
+    def update_catalogs(self, project, previous_version, current_version):
+        """
+        Recreate all existing catalogs from previous version in the current one, 
+        then update them from the given POT file
+        """
+        current_template = current_version.get_babel_template()
+        current_templatemsg_map = dict([(item.message, item) for item in current_version.templatemsg_set.all()])
+        
+        # For each existing catalog in previous project version
+        for previous_catalog in previous_version.catalog_set.all():
+            current_babel_catalog = previous_catalog.get_babel_catalog()
+            current_babel_catalog.update(current_template)
+            # New catalog for current version
+            current_catalog = current_version.catalog_set.create(
+                locale = previous_catalog.locale,
+                header_comment = current_version.header_comment,
+                mime_headers = current_version.mime_headers,
+            )
+            
+            # Add entries to the new catalog from template messages
+            entries = []
+            for template_id,template_instance in current_templatemsg_map.items():
+                message = ''
+                fuzzy = False
+                if template_id in current_babel_catalog:
+                    if current_babel_catalog[template_id].string:
+                        message = current_babel_catalog[template_id].string
+                    fuzzy = current_babel_catalog[template_id].fuzzy
+                entries.append(TranslationMsg(template=template_instance, catalog=current_catalog, message=message, fuzzy=fuzzy))
+            # Bulk saving entries
+            TranslationMsg.objects.bulk_create(entries)
 
 
 class CatalogForm(forms.ModelForm):
