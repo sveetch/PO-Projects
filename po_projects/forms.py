@@ -71,7 +71,7 @@ class ProjectForm(forms.ModelForm):
         project.save()
         
         # Create a the first project_version
-        self.create_new_version(project, "0.1.0")
+        self.create_new_version(project, 1)
             
         return project
     
@@ -106,7 +106,7 @@ class ProjectUpdateForm(ProjectForm):
         if commit:
             if self.uploaded_catalog:
                 previous_version = project.get_current_version()
-                current_version = self.create_new_version(project, "0.2.0")
+                current_version = self.create_new_version(project, previous_version.version+1)
                 self.update_catalogs(project, previous_version, current_version)
             project.save()
             
@@ -122,8 +122,10 @@ class ProjectUpdateForm(ProjectForm):
         
         # For each existing catalog in previous project version
         for previous_catalog in previous_version.catalog_set.all():
+            # Update previous catalog from the given POT file
             current_babel_catalog = previous_catalog.get_babel_catalog()
             current_babel_catalog.update(current_template)
+            
             # New catalog for current version
             current_catalog = current_version.catalog_set.create(
                 locale = previous_catalog.locale,
@@ -141,6 +143,7 @@ class ProjectUpdateForm(ProjectForm):
                         message = current_babel_catalog[template_id].string
                     fuzzy = current_babel_catalog[template_id].fuzzy
                 entries.append(TranslationMsg(template=template_instance, catalog=current_catalog, message=message, fuzzy=fuzzy))
+            
             # Bulk saving entries
             TranslationMsg.objects.bulk_create(entries)
 

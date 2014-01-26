@@ -44,8 +44,7 @@ class ProjectVersion(models.Model):
     Project version is what contains catalogs and template catalogs for a specific POT file version
     """
     project = models.ForeignKey(Project, verbose_name=_('project'), blank=False)
-    # TODO: Move this to a tiny integer, manage version numbers without dots
-    version = models.CharField(_('version'), max_length=15)
+    version = models.SmallIntegerField(_('version'))
     header_comment = models.TextField(_('header comment'))
     mime_headers = models.TextField(_('mime headers'))
 
