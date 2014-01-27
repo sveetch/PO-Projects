@@ -104,6 +104,9 @@ class Catalog(models.Model):
     mime_headers = models.TextField(_('mime headers'))
 
     def __unicode__(self):
+        return self.get_locale_name()
+
+    def get_locale_name(self):
         l = Locale.parse(self.locale)
         return l.english_name
 

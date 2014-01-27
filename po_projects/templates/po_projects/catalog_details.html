@@ -3,10 +3,7 @@
 {% block title %}{% trans "Manage Catalog" %}{% endblock %}
 
 {% block content %}
-    <h2><small>{{ project.name }}</small> {{ catalog }}</h2>
-    
-    <hr>
-    <h4>{% trans "Edit infos" %}</h4>
+    <h3>{% trans "Edit infos" %}</h3>
     {% crispy form %}
     
     <hr>

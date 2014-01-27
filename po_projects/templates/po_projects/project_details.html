@@ -3,9 +3,6 @@
 {% block title %}{% trans "Create a new project" %}{% endblock %}
 
 {% block content %}
-    <h2><small>{% trans "Project" %}</small> {{ project.name }}</h2>
-    
-    <hr>
     <h3>{% trans "Project translations" %}</h3>
     <ul class="disc">{% for item in project_version.catalog_set.all %}
         <li>

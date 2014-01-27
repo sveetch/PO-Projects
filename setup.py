@@ -25,7 +25,7 @@ setup(
         'Babel==1.3',
         'django-braces==1.0.0',
         'South==0.7.6',
-        'autobreadcrumbs==0.9.0',
+        'autobreadcrumbs >= 0.9.1',
         'djangocodemirror==0.9.3',
         'django-crispy-forms >= 1.3.2',
     ],

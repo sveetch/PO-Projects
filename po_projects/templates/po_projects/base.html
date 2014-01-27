@@ -1,9 +1,10 @@
 {% extends "skeleton.html" %}
-{% load i18n autobreadcrumb %}
+{% load autobreadcrumb %}
 
 {% block base_content %}<div class="row po_projects">
     <div class="small-12 columns">
         {% autobreadcrumbs_tag %}
+        <h2>{% current_title_from_breadcrumbs %}</h2>
         {% block content %}{% endblock %}
     </div>
 </div>{% endblock %}
