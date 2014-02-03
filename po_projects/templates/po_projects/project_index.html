@@ -3,13 +3,24 @@
 {% block title %}{% trans "Projects" %}{% endblock %}
 
 {% block content %}
-    <p class="text-right">
-        <a href="{% url 'po_projects:project-create' %}" class="button large">Create a new project</a>
-    </p>
+    <div class="panel panel-headed radius">
+        <h3>{% trans "Projects list" %}</h3>
+        <ul class="list-group">{% for project_item in project_list %}
+            <li>{% with project_item.get_current_version as current_version %}
+                <h4><a href="{% url 'po_projects:project-details' slug=project_item.slug %}">{{ project_item.name }}</a> <small>v{{ current_version.version }}</small></h4>
+                <p>{{ project_item.description }}</p>
+                <ul class="inline-list strong-items">
+                    <li><strong>{% trans "catalog" %} :</strong> 2</li>
+                    <li><strong>{% trans "message" %} :</strong> 5</li>
+                </ul>
+            {% endwith %}</li>
+        {% empty %}
+        <li class="empty">{% trans "There is no project yet" %}</li>
+        {% endfor %}</ul>
+    </div>
     
-    <ul class="disc">{% for item in project_list %}
-        <li><a href="{% url 'po_projects:project-details' slug=item.slug %}">{{ item.get_current_version }}</a></li>
-    {% empty %}
-    <li>There is no project yet</li>
-    {% endfor %}</ul>
+    <hr>
+    <p class="text-center">
+        <a href="{% url 'po_projects:project-create' %}" class="button large">{% trans "Start a new project" %}</a>
+    </p>
 {% endblock %}

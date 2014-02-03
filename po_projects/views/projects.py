@@ -26,7 +26,7 @@ from po_projects.forms import ProjectForm, ProjectUpdateForm, CatalogForm, Trans
 from po_projects.utils import DownloadMixin
 from po_projects.dump import po_project_export
 
-class ProjectIndex(generic.TemplateView):
+class ProjectIndex(LoginRequiredMixin, generic.TemplateView):
     """
     Project index
     """

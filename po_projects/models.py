@@ -28,6 +28,7 @@ class Project(models.Model):
     """
     name = models.CharField(_('name'), max_length=150)
     slug = models.SlugField(_('slug'), unique=True, max_length=75)
+    description = models.TextField(_('description'), blank=True)
 
     def __unicode__(self):
         return self.name

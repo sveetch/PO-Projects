@@ -1,3 +1,5 @@
+.. _django-guardian: https://github.com/lukaszb/django-guardian
+
 **PO Projects** is a first attempt to build a PO file management factory like, 
 somehow like Transifex, but more simplest.
 
@@ -15,14 +17,13 @@ Actually we have
 * View to export project translations as PO files;
 * View to export an archive (zip/tarball) of all translations as PO files from a project;
 * Manage fuzzy mode for translations;
+* Form to import a catalog (PO) to update a catalog;
 
 For beta staging this should implement
 ======================================
 
-* Form to import a catalog (PO) to update a catalog;
-* Better global ergonomy;
 * Better model admin;
-* Permission restriction;
+* Permission restriction (with `django-guardian`_);
 * User authoring to know who has done what;
 * External API access to get PO files or global project archive from external tools 
   (like Optimus or a Django app from an external site) ?
