@@ -13,7 +13,11 @@
         <li class="empty">There is no translation yet</li>
     {% endfor %}</ul>
     
-    <a href="{% url 'po_projects:project-download' slug=project.slug %}" class="button">{% trans "Download archive" %}</a>
+    <a href="#" data-dropdown="download-dropdown" class="button dropdown">{% trans "Download archive" %}</a>
+    <ul id="download-dropdown" data-dropdown-content class="f-dropdown">{% for item in AVAILABLE_CATALOG_FILENAMES %}
+        <li><a href="{% url 'po_projects:project-download' slug=project.slug %}?kind={{ item }}">{% blocktrans with catalog_filename_kind=item|title %}For {{ catalog_filename_kind }}{% endblocktrans %}</a></li>
+    {% endfor %}</ul>
+    
     <a href="{% url 'po_projects:project-update' slug=project.slug %}" class="button">{% trans "Update" %}</a>
     
     <hr>

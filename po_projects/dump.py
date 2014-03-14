@@ -14,10 +14,7 @@ from django.conf import settings
 
 from po_projects.models import Project, Catalog
 
-POT_ARCHIVE_PATH = "locale/messages.pot"
-PO_ARCHIVE_PATH = "locale/{locale}/LC_MESSAGES/messages.po"
-
-def po_project_export(project, project_version, archive_fileobj):
+def po_project_export(project, project_version, archive_fileobj, catalog_filename):
     """
     Export all catalogs from a project into PO files with the good directory 
     structure
@@ -28,13 +25,11 @@ def po_project_export(project, project_version, archive_fileobj):
     template_file = StringIO()
     write_po(template_file, project_version.get_babel_template(), sort_by_file=False, ignore_obsolete=True, include_previous=False)
     template_file.seek(0)
-    archive_files.append( (POT_ARCHIVE_PATH, template_file) )
+    archive_files.append( (settings.POT_ARCHIVE_PATH.format(catalog_filename=catalog_filename), template_file) )
     
     # Catalog PO files
     for catalog in project_version.catalog_set.all():
-        archived_path = PO_ARCHIVE_PATH.format(locale=catalog.locale)
-        #print " * Catalog:", catalog.locale
-        #print "     - Path :", archived_path
+        archived_path = settings.PO_ARCHIVE_PATH.format(locale=catalog.locale, catalog_filename=catalog_filename)
         # Open a new catalog
         babel_catalog = catalog.get_babel_catalog()
         # Write it to a buffer string
