@@ -56,7 +56,7 @@ class ProjectVersion(models.Model):
         forged_catalog = BabelCatalog(
             header_comment=self.header_comment,
             project=self.project.name,
-            version=self.version
+            version=str(self.version)
         )
         
         for entry in self.templatemsg_set.all().order_by('id'):
@@ -127,7 +127,7 @@ class Catalog(models.Model):
             locale=self.locale, 
             header_comment=self.header_comment,
             project=self.project_version.project.name,
-            version=self.project_version.version
+            version=str(self.project_version.version)
         )
         
         for entry in self.translationmsg_set.all().order_by('id'):
