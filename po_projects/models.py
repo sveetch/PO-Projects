@@ -83,6 +83,15 @@ class TemplateMsg(models.Model):
     def __unicode__(self):
         return self.message
 
+    def get_truncated_message(self):
+        """Return truncated message to avoid message too long"""
+        if not self.message:
+            return ''
+        elif len(self.message) <= 50:
+            return self.message
+        return self.message[0:50]+' [...]'
+    get_truncated_message.short_description = 'Message'
+
     def get_locations_set(self):
         """Return a set from stored locations in JSON"""
         return set([tuple(item) for item in json.loads(self.locations)])
@@ -153,6 +162,15 @@ class TranslationMsg(models.Model):
 
     def __unicode__(self):
         return self.message
+
+    def get_truncated_message(self):
+        """Return truncated message to avoid message too long"""
+        if not self.message:
+            return ''
+        elif len(self.message) <= 50:
+            return self.message
+        return self.message[0:50]+' [...]'
+    get_truncated_message.short_description = 'Message'
 
     def get_flags(self):
         """Return a set of flags computed from some model attributes"""

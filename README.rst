@@ -20,7 +20,6 @@ Features
 Planned
 =======
 
-* Better model admin;
 * Permission restriction (with `django-guardian`_);
 * User authoring to know who has done what;
 * Restricted API access to get PO files or global project archive from external tools 
