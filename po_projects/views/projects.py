@@ -37,14 +37,14 @@ class ProjectIndex(LoginRequiredMixin, generic.TemplateView):
         return self.render_to_response(context)
 
 
-#class ProjectCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
-class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
+class ProjectCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     """
     Form view to create a Project
     """
     model = Project
     template_name = "po_projects/project_form.html"
     form_class = ProjectForm
+    permission_required = "po_projects.add_project"
 
     def get_success_url(self):
         return reverse('po_projects:project-details', args=[self.object.slug])
@@ -98,6 +98,7 @@ class ProjectDetails(LoginRequiredMixin, generic.CreateView):
     def get_form_kwargs(self):
         kwargs = super(ProjectDetails, self).get_form_kwargs()
         kwargs.update({
+            'author': self.request.user,
             'project_version': self.project_version,
         })
         return kwargs
@@ -149,13 +150,14 @@ class ProjectExportView(LoginRequiredMixin, DownloadMixin, generic.View):
         return archive_file.getvalue()
 
 
-class ProjectUpdate(LoginRequiredMixin, generic.UpdateView):
+class ProjectUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     """
     Form view to update project template and catalogs from a POT file
     """
     model = Project
     template_name = "po_projects/project_form.html"
     form_class = ProjectUpdateForm
+    permission_required = "po_projects.change_project"
 
     def get(self, request, *args, **kwargs):
         self.project = self.get_project(**kwargs)

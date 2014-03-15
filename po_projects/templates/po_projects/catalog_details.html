@@ -3,9 +3,9 @@
 {% block title %}{% trans "Manage Catalog" %}{% endblock %}
 
 {% block content %}
-    <hr>
+    {% if perms.po_projects.change_catalog %}<hr>
     <h3>{% trans "Edit infos" %}</h3>
-    {% crispy form %}
+    {% crispy form %}{% endif %}
     
     <hr>
     <h3>{% trans "Messages" %}</h3>
@@ -13,6 +13,6 @@
     
     <p class="text-right">
         <a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Download PO" %}</a>
-        <a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a>
+        {% if perms.po_projects.edit_messages %}<a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a>{% endif %}
     </p>
 {% endblock %}

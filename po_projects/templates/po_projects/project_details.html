@@ -18,11 +18,11 @@
         <li><a href="{% url 'po_projects:project-download' slug=project.slug %}?kind={{ item }}">{% blocktrans with catalog_filename_kind=item|title %}For {{ catalog_filename_kind }}{% endblocktrans %}</a></li>
     {% endfor %}</ul>
     
-    <a href="{% url 'po_projects:project-update' slug=project.slug %}" class="button">{% trans "Update" %}</a>
+    {% if perms.po_projects.change_project %}<a href="{% url 'po_projects:project-update' slug=project.slug %}" class="button">{% trans "Update" %}</a>{% endif %}
     
-    <hr>
+    {% if perms.po_projects.add_catalog %}<hr>
     <h4>{% trans "Add new catalog" %}</h4>
-    {% crispy form %}
+    {% crispy form %}{% endif %}
     
     <hr>
     <h3>{% trans "Messages to translate" %} ({{ project.get_current_version.templatemsg_set.count }})</h3>

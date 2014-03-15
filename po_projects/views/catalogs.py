@@ -16,6 +16,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.forms.models import modelformset_factory
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
+from extra_views import ModelFormSetView
 
 from babel.messages.pofile import read_po, write_po
 from babel.messages.catalog import Catalog as BabelCatalog
@@ -69,42 +70,48 @@ class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
     def get_form_kwargs(self):
         kwargs = super(CatalogDetails, self).get_form_kwargs()
         kwargs.update({
+            'author': self.request.user,
             'project_version': self.project_version,
         })
         return kwargs
 
 
-def CatalogMessagesFormView(request, slug=None, version=None, locale=None):
+class CatalogMessagesFormView(LoginRequiredMixin, PermissionRequiredMixin, ModelFormSetView):
     """
     Form view to edit messages from a catalog
-    
-    Implemented without CBV until i find HOW to do it with formset usage
     """
+    permission_required = "po_projects.edit_messages"
     template_name = "po_projects/catalog_messages_form.html"
-    
-    project = get_object_or_404(Project, slug=slug)
-    if version is not None:
-        project_version = get_object_or_404(ProjectVersion, project=project, version=version)
-    else:
-        project_version = project.get_current_version()
-    catalog = get_object_or_404(Catalog, project_version=project_version, locale=locale)
-    
-    formset_queryset = TranslationMsg.objects.select_related('template').filter(catalog=catalog)
-    
-    TranslationMsgFormSet = modelformset_factory(TranslationMsg, form=TranslationMsgForm, fields=('template','fuzzy','message',), extra=0)
-    
-    formset = TranslationMsgFormSet(request.POST or None, queryset=formset_queryset)
-    
-    if formset.is_valid():
-        formset.save()
-    
-    extra_context = {
-        "project": project,
-        "project_version": project_version,
-        "catalog": catalog,
-        "formset": formset
-    }
-    return render_to_response(template_name, extra_context, context_instance=RequestContext(request))
+    model = TranslationMsg
+    form_class = TranslationMsgForm
+    fields = ('template','fuzzy','message',)
+    extra = 0
+
+    def get(self, request, *args, **kwargs):
+        self.project = self.get_project()
+        self.project_version = self.get_project_version()
+        self.catalog = self.get_catalog()
+        return super(CatalogMessagesFormView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.project = self.get_project()
+        self.project_version = self.get_project_version()
+        self.catalog = self.get_catalog()
+        return super(CatalogMessagesFormView, self).post(request, *args, **kwargs)
+
+    def get_project(self):
+        return get_object_or_404(Project, slug=self.kwargs['slug'])
+
+    def get_project_version(self):
+        if "version" in self.kwargs:
+            return get_object_or_404(ProjectVersion, project=self.project, version=self.kwargs['version'])
+        return self.project.get_current_version()
+
+    def get_catalog(self):
+        return get_object_or_404(Catalog, project_version=self.project_version, locale=self.kwargs['locale'])
+
+    def get_queryset(self):
+        return super(CatalogMessagesFormView, self).get_queryset().select_related('template').filter(catalog=self.catalog)
 
 
 class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View):

@@ -16,14 +16,15 @@ Features
 * Manage fuzzy mode for translations;
 * Form to import a catalog (PO) to update a catalog;
 * Nice frontend with Foundation;
+* Permission restriction;
 
 Planned
 =======
 
-* Permission restriction (with `django-guardian`_);
 * User authoring to know who has done what;
 * Restricted API access to get PO files or global project archive from external tools 
   (like Optimus or a Django app from an external site) ?
+* More granual permission restriction with `django-guardian`_;
 
 External API access
 ===================

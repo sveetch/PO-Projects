@@ -47,6 +47,7 @@ class ProjectForm(forms.ModelForm):
     po_file = forms.FileField(label=_('POT File'), required=True, help_text='Upload a valid POT file to initialize project strings to translate')
     
     def __init__(self, author=None, *args, **kwargs):
+        self.author = author
         self.uploaded_catalog = None
         self.catalog_entries = []
         
@@ -96,7 +97,8 @@ class ProjectForm(forms.ModelForm):
 class ProjectUpdateForm(ProjectForm):
     """Project Form for update"""
     def __init__(self, author=None, *args, **kwargs):
-        super(ProjectUpdateForm, self).__init__(*args, **kwargs)
+        self.author = author
+        super(ProjectUpdateForm, self).__init__(author, *args, **kwargs)
         
         self.fields['po_file'].required = False
 
@@ -150,7 +152,8 @@ class ProjectUpdateForm(ProjectForm):
 
 class CatalogForm(forms.ModelForm):
     """Catalog base Form"""
-    def __init__(self, project_version=None, *args, **kwargs):
+    def __init__(self, author=None, project_version=None, *args, **kwargs):
+        self.author = author
         self.project_version = project_version
         self.fill_messages = not(kwargs.get('instance'))
         self.helper = FormHelper()
@@ -174,6 +177,15 @@ class CatalogForm(forms.ModelForm):
                 data = get_locale_identifier((self.locale_trans.language, self.locale_trans.territory, self.locale_trans.script, self.locale_trans.variant), sep='_')
         return data
 
+    def clean(self):
+        cleaned_data = super(CatalogForm, self).clean()
+        
+        if not self.author.has_perm('po_projects.add_catalog'):
+            raise forms.ValidationError(_("You don't have permission to use this form"))
+
+        # Always return the full collection of cleaned data.
+        return cleaned_data
+    
     def save(self, commit=True):
         catalog = super(CatalogForm, self).save(commit=False)
         catalog.project_version = self.project_version
@@ -202,11 +214,21 @@ class CatalogUpdateForm(CatalogForm):
     """Catalog update Form"""
     po_file = forms.FileField(label=_('PO File'), required=False, help_text='Upload a valid PO file to update catalog messages, it will only update allready existing messages from the template, it does not add new message or remove existing messages. Be careful this will overwrite previous translations.')
     
-    def __init__(self, project_version=None, *args, **kwargs):
+    def __init__(self, author=None, project_version=None, *args, **kwargs):
+        self.author = author
         self.fill_messages = False # Never re-fill catalog with translation from template
         self.uploaded_catalog = None
         
-        super(CatalogUpdateForm, self).__init__(project_version, *args, **kwargs)
+        super(CatalogUpdateForm, self).__init__(author, project_version, *args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super(CatalogForm, self).clean()
+        
+        if not self.author.has_perm('po_projects.change_catalog'):
+            raise forms.ValidationError(_("You don't have permission to use this form"))
+
+        # Always return the full collection of cleaned data.
+        return cleaned_data
 
     def clean_po_file(self):
         data = self.cleaned_data['po_file']

@@ -148,6 +148,9 @@ class Catalog(models.Model):
     class Meta:
         verbose_name = _('catalog')
         verbose_name_plural = _('catalogs')
+        permissions = (
+            ('edit_messages', 'Edit messages'),
+        )
 
 class TranslationMsg(models.Model):
     """

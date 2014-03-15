@@ -23,11 +23,13 @@ setup(
     ],
     install_requires=[
         'Babel==1.3',
-        'django-braces==1.0.0',
+        'django-braces>=1.2.0,<1.4',
+        'django-extra-views',
         'South==0.7.6',
         'autobreadcrumbs >= 0.9.1',
         'djangocodemirror==0.9.3',
         'django-crispy-forms >= 1.3.2',
+        #'django-guardian >= 1.2',
     ],
     include_package_data=True,
     zip_safe=False
