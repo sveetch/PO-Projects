@@ -1,4 +1,5 @@
 .. _django-guardian: https://github.com/lukaszb/django-guardian
+.. _djangorestframework: http://www.django-rest-framework.org
 
 **PO Projects** is a PO file management factory.
 
@@ -21,9 +22,9 @@ Features
 Planned
 =======
 
+* Restricted API access with `djangorestframework`_ to get PO files or global project 
+  archive from external tools (like Optimus or a Django app from an external site) ?
 * User authoring to know who has done what;
-* Restricted API access to get PO files or global project archive from external tools 
-  (like Optimus or a Django app from an external site) ?
 * More granual permission restriction with `django-guardian`_;
 
 External API access
