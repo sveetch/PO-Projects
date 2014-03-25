@@ -30,6 +30,7 @@ setup(
         'djangocodemirror==0.9.3',
         'django-crispy-forms >= 1.3.2',
         #'django-guardian >= 1.2',
+        #'djangorestframework >= 2.3',
     ],
     include_package_data=True,
     zip_safe=False
