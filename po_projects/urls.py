@@ -41,8 +41,9 @@ else:
     rest_urlpatterns = format_suffix_patterns(patterns('po_projects.rest.views',
         url(r'^rest/$', 'api_root'),
         url(r'^rest/projects/$', views.ProjectList.as_view(), name='api-project-list'),
-        url(r'^rest/projects/(?P<slug>[-\w]+)/$', views.ProjectDetail.as_view(), name='api-project-detail'),
-        url(r'^rest/projects/(?P<slug>[-\w]+)/tarball/$', views.ProjectArchive.as_view(), name='api-project-archive'),
+        url(r'^rest/projects/current/(?P<slug>[-\w]+)/$', views.ProjectCurrentDetail.as_view(), name='api-project-detail'),
+        url(r'^rest/projects/current/(?P<slug>[-\w]+)/tarball/$', views.ProjectArchive.as_view(), name='api-project-archive'),
+        url(r'^rest/projects/version/(?P<pk>\d+)/$', views.ProjectVersionDetail.as_view(), name='api-project-version-detail'),
     ))
 
     urlpatterns = rest_urlpatterns + urlpatterns
