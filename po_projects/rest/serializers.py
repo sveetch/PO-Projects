@@ -68,19 +68,20 @@ class ProjectCurrentSerializer(ProjectVersionSerializer):
     
     def validate_pot(self, attrs, source):
         """
-        TODO: improve validation
+        Validation for the given POT content
         """
-        print "TODO: check valid pot file"
+        #print "check valid pot file"
         value = attrs[source]
         if value:
-            #try:
-            template_file = StringIO()
-            template_file.write(value)
-            template_file.seek(0)
-            uploaded_catalog = read_po(template_file, ignore_obsolete=True)
-            print [error for error in uploaded_catalog.check()]
-            #except:
-                #raise serializers.ValidationError("Your file does not seem to be a valid POT file")
+            try:
+                template_file = StringIO()
+                template_file.write(value)
+                template_file.seek(0)
+                # Seems the validation from read_po is too much minimalistic
+                # This does not really valid if the content is a real POT content
+                uploaded_catalog = read_po(template_file, ignore_obsolete=True)
+            except:
+                raise serializers.ValidationError("Your file does not seem to be a valid POT file")
         return attrs
     
     class Meta:
