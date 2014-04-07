@@ -10,8 +10,6 @@ from po_projects.views.catalogs import CatalogDetails, CatalogMessagesExportView
 urlpatterns = patterns('',
     url(r'^$', ProjectIndex.as_view(), name='project-index'),
     
-    #url(r'^', include(router.urls)),
-    
     url(r'^create/$', ProjectCreateView.as_view(), name='project-create'),
     url(r'^(?P<slug>[-\w]+)/$', ProjectDetails.as_view(), name='project-details'),
     url(r'^(?P<slug>[-\w]+)/update/$', ProjectUpdate.as_view(), name='project-update'),
@@ -43,6 +41,7 @@ else:
         url(r'^rest/projects/$', views.ProjectList.as_view(), name='api-project-list'),
         url(r'^rest/projects/current/(?P<slug>[-\w]+)/$', views.ProjectCurrentDetail.as_view(), name='api-project-detail'),
         url(r'^rest/projects/current/(?P<slug>[-\w]+)/tarball/$', views.ProjectArchive.as_view(), name='api-project-archive'),
+        #url(r'^rest/projects/current/(?P<slug>[-\w]+)/pot-update/$', views.ProjectCurrentDetail.as_view(), name='api-project-pot-update'),
         url(r'^rest/projects/version/(?P<pk>\d+)/$', views.ProjectVersionDetail.as_view(), name='api-project-version-detail'),
     ))
 
