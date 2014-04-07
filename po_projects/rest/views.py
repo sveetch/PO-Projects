@@ -37,12 +37,22 @@ class ProjectList(APIView):
         return Response(serializer.data)
 
 
-class ProjectCurrentDetail(generics.RetrieveUpdateAPIView):
+class ProjectDetailMixin(object):
     """
-    Retrieve the current last version of a project instance from its slug. 
+    Mixin to get Project object
+    
+    NOTE: is this required anymore ?
+    """
+    def get_object(self):
+        return get_object_or_404(Project, slug=self.kwargs['slug'])
+
+
+class ProjectCurrentDetail(ProjectDetailMixin, generics.RetrieveUpdateAPIView):
+    """
+    Retrieve and update the current last version of a project instance from its slug. 
     
     * ``projectversion_set`` attribute will contains the project versions;
-    * ``tarball`` attribute is a link to download a ZIP archive of PO files for the current project version;
+    * ``tarball_url`` attribute is a link to download a ZIP archive of PO files for the current project version;
     
     ``projectversion_set`` urls use the version ID (pk), not the slug or version name.
     
@@ -51,42 +61,27 @@ class ProjectCurrentDetail(generics.RetrieveUpdateAPIView):
     serializer_class = ProjectCurrentSerializer
     model = Project
     
-    def get_object(self):
-        try:
-            return Project.objects.get(slug=self.kwargs['slug'])
-        except Project.DoesNotExist:
-            raise Http404
-
-    def get(self, request, slug, format=None):
-        self.object = self.get_object()
-        self.project_version = self.get_project_version()
-        serializer = ProjectCurrentSerializer(self.object, context={'request': request})
-        return Response(serializer.data)
-
-    def get_project_version(self):
-        if "version" in self.kwargs:
-            return get_object_or_404(ProjectVersion, project=self.object, version=self.kwargs['version'])
-        return self.object.get_current_version()
-
-    #def post(self, request, format=None):
-        #serializer = ProjectCurrentSerializer(data=request.DATA, context={'request': request})
-        #if serializer.is_valid():
-            #serializer.save()
-            #return Response(serializer.data, status=status.HTTP_201_CREATED)
-        #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def update(self, request, *args, **kwargs):
+        response = super(ProjectCurrentDetail, self).update(request, *args, **kwargs)
+        
+        serializer = self.get_serializer(self.object, data=request.DATA, files=request.FILES, partial=kwargs.pop('partial', False))
+        
+        if serializer.is_valid():
+            pot_data = request.DATA.get('pot', '')
+            if pot_data:
+                print pot_data
+            
+        return response
 
 
 class ProjectVersionDetail(APIView):
     """
-    Retrieve a project version instance from its ID.
+    Retrieve a project instance for a specific version given by its ID.
     
-    Project version are freezed, so you can't update them.
+    Project versions are freezed, so you can't update them.
     """
     def get_object(self, pk):
-        try:
-            return get_object_or_404(ProjectVersion, pk=pk)
-        except Project.DoesNotExist:
-            raise Http404
+        return get_object_or_404(ProjectVersion, pk=pk)
 
     def get(self, request, pk, format=None):
         self.project_version = self.get_object(pk)
@@ -94,13 +89,8 @@ class ProjectVersionDetail(APIView):
         serializer = ProjectVersionSerializer(self.object, context={'request': request})
         return Response(serializer.data)
 
-    def get_project_version(self):
-        if "version" in self.kwargs:
-            return get_object_or_404(ProjectVersion, project=self.object, version=self.kwargs['version'])
-        return self.object.get_current_version()
 
-
-class ProjectArchive(DownloadMixin, APIView):
+class ProjectArchive(ProjectDetailMixin, DownloadMixin, APIView):
     """
     Send a ZIP archive for the project's PO files
     
@@ -109,21 +99,9 @@ class ProjectArchive(DownloadMixin, APIView):
     content_type = 'application/x-gzip'
     filename_format = "{project_slug}_{timestamp}.tar.gz"
     
-    def get_object(self, slug):
-        try:
-            return Project.objects.get(slug=slug)
-        except Project.DoesNotExist:
-            raise Http404
-
     def get(self, request, slug, format=None):
-        self.object = self.get_object(slug)
-        self.project_version = self.get_project_version()
+        self.object = self.get_object()
         return super(ProjectArchive, self).get(request)
-
-    def get_project_version(self):
-        if "version" in self.kwargs:
-            return get_object_or_404(ProjectVersion, project=self.object, version=self.kwargs['version'])
-        return self.object.get_current_version()
 
     def get_catalog_kind(self):
         kind = self.request.GET.get('kind', settings.DEFAULT_CATALOG_FILENAMES)
@@ -146,6 +124,6 @@ class ProjectArchive(DownloadMixin, APIView):
     def get_content(self, context):
         archive_file = StringIO()
         
-        po_project_export(self.object, self.project_version, archive_file, catalog_filename=self.get_catalog_kind())
+        po_project_export(self.object, self.object.get_current_version(), archive_file, catalog_filename=self.get_catalog_kind())
         
         return archive_file.getvalue()
