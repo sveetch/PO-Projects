@@ -13,7 +13,7 @@ from rest_framework.reverse import reverse
 
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
 from po_projects.rest.serializers import ProjectCurrentSerializer, ProjectVersionSerializer
-from po_projects.utils import DownloadMixin
+from po_projects.mixins import DownloadMixin
 from po_projects.dump import po_project_export
 
 @api_view(('GET',))
@@ -52,26 +52,19 @@ class ProjectCurrentDetail(ProjectDetailMixin, generics.RetrieveUpdateAPIView):
     Retrieve and update the current last version of a project instance from its slug. 
     
     * ``projectversion_set`` attribute will contains the project versions;
-    * ``tarball_url`` attribute is a link to download a ZIP archive of PO files for the current project version;
+    * ``tarball_url`` attribute is a link to download a ZIP archive of PO files for the 
+      current project version;
     
     ``projectversion_set`` urls use the version ID (pk), not the slug or version name.
     
-    This view is a "Retrieve and update" view, so you can see and get project details but also update its content.
+    This view is a "Retrieve and update" view, so you can see and get project details 
+    but also update its content.
+    
+    The ``pot`` field is optionnal, you can fill it with the content of a valid POT file 
+    to update project template catalog and its translation catalogs.
     """
     serializer_class = ProjectCurrentSerializer
     model = Project
-    
-    def update(self, request, *args, **kwargs):
-        response = super(ProjectCurrentDetail, self).update(request, *args, **kwargs)
-        
-        serializer = self.get_serializer(self.object, data=request.DATA, files=request.FILES, partial=kwargs.pop('partial', False))
-        
-        if serializer.is_valid():
-            pot_data = request.DATA.get('pot', '')
-            if pot_data:
-                print pot_data
-            
-        return response
 
 
 class ProjectVersionDetail(APIView):

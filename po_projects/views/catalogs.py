@@ -23,7 +23,7 @@ from babel.messages.catalog import Catalog as BabelCatalog
 
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
 from po_projects.forms import ProjectForm, CatalogUpdateForm, TranslationMsgForm
-from po_projects.utils import DownloadMixin
+from po_projects.mixins import DownloadMixin
 
 
 class CatalogDetails(LoginRequiredMixin, generic.UpdateView):

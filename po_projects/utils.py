@@ -1,67 +1,80 @@
-import datetime
+import json
 
-from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from po_projects.models import TemplateMsg, TranslationMsg
 
-class DownloadMixin(object):
+def create_templatemsgs(project_version, pot_catalog, commit=True):
     """
-    Simple Mixin to send a downloadable content
+    Create template messages from a POT catalog
     
-    Inherits must have :
-    
-    * Filled the ``self.content_type`` attribute with the content content_type to send;
-    * Implementation of ``get_filename()`` that return the filename to use in response 
-      headers;
-    * Implementation of ``get_content()`` that return the content to send as downloadable.
-    
-    If the content is a not a string, it is assumed to be a fileobject to send as 
-    the content with its ``read()`` method.
-    
-    Optionnaly implement a ``close_content()`` to close specifics objects linked to 
-    content fileobject, if it does not exists a try will be made on a close() method 
-    on the content fileobject;
-    
-    A "get_filename_timestamp" method is implemented to return a timestamp to use in your 
-    filename if needed, his date format is defined in "timestamp_format" attribute (in a 
-    suitable way to use with strftime on a datetime object).
+    @project_version: ProjectVersion instance
+    @pot_catalog: Babel Catalog instance
     """
-    content_type = None
-    timestamp_format = "%Y-%m-%d"
-    
-    def get_filename_timestamp(self):
-        return datetime.datetime.now().strftime(self.timestamp_format)
-    
-    def get_filename(self, context):
-        raise ImproperlyConfigured("DownloadMixin requires an implementation of 'get_filename()' to return the filename to use in headers")
-    
-    def get_content(self, context):
-        raise ImproperlyConfigured("DownloadMixin requires an implementation of 'get_content()' to return the downloadable content")
-    
-    def render_to_response(self, context, **response_kwargs):
-        if getattr(self, 'content_type', None) is None:
-            raise ImproperlyConfigured("DownloadMixin requires a definition of 'content_type' attribute")
-        # Needed headers
-        response = HttpResponse(content_type=self.content_type, **response_kwargs)
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(self.get_filename(context))
-        # Read the content file object or string, append it to response and close it
-        content = self.get_content(context)
-        if isinstance(content, basestring):
-            response.write(content)
-        else:
-            response.write(content.read())
-        # Conditionnal closing content object
-        if hasattr(self, 'close_content'):
-            self.close_content(context, content)
-        elif hasattr(content, 'close'):
-            content.close()
-            
-        return response
+    entries = []
+    for message in pot_catalog:
+        if message.id:
+            #print message.id
+            flags = json.dumps(list(message.flags))
+            locations = json.dumps(message.locations)
+            entries.append(TemplateMsg(project_version=project_version, message=message.id, locations=locations, flags=flags))
+        
+    if commit:
+        TemplateMsg.objects.bulk_create(entries)
+        
+    return entries
 
-    def get_context_data(self, **kwargs):
-        return {
-            'params': kwargs
-        }
+def create_new_version(project, version, uploaded_catalog):
+    """
+    Open a new version for a project and fill it with datas from the given 
+    POT file
+    
+    @project: Project instance
+    @version: Version label as a string
+    @uploaded_catalog: Babel Catalog instance
+    """
+    project_version = project.projectversion_set.create(
+        version = version,
+        header_comment = uploaded_catalog.header_comment,
+        mime_headers = json.dumps(dict(uploaded_catalog.mime_headers)),
+    )
+    create_templatemsgs(project_version, uploaded_catalog)
+    
+    return project_version
 
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        return self.render_to_response(context)
+def update_catalogs(project, previous_version, current_version):
+    """
+    Recreate all existing catalogs from previous version in the current one, 
+    then update them from the given POT file
+    
+    @project: Project instance
+    @previous_version: ProjectVersion instance for the previous version
+    @current_version: ProjectVersion instance for the newly created version
+    """
+    current_template = current_version.get_babel_template()
+    current_templatemsg_map = dict([(item.message, item) for item in current_version.templatemsg_set.all()])
+    
+    # For each existing catalog in previous project version
+    for previous_catalog in previous_version.catalog_set.all():
+        # Update previous catalog from the given POT file
+        current_babel_catalog = previous_catalog.get_babel_catalog()
+        current_babel_catalog.update(current_template)
+        
+        # New catalog for current version
+        current_catalog = current_version.catalog_set.create(
+            locale = previous_catalog.locale,
+            header_comment = current_version.header_comment,
+            mime_headers = current_version.mime_headers,
+        )
+        
+        # Add entries to the new catalog from template messages
+        entries = []
+        for template_id,template_instance in current_templatemsg_map.items():
+            message = ''
+            fuzzy = False
+            if template_id in current_babel_catalog:
+                if current_babel_catalog[template_id].string:
+                    message = current_babel_catalog[template_id].string
+                fuzzy = current_babel_catalog[template_id].fuzzy
+            entries.append(TranslationMsg(template=template_instance, catalog=current_catalog, message=message, fuzzy=fuzzy))
+        
+        # Bulk saving entries
+        TranslationMsg.objects.bulk_create(entries)
