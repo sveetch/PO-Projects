@@ -19,27 +19,13 @@ from babel.messages.pofile import read_po
 
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
 
+from po_projects.utils import create_templatemsgs, create_new_version, update_catalogs
 
 class SourceTextField(UneditableField):
     """
     Layout object for rendering template field as simple html text
     """
     template = "po_projects/input_as_text.html"
-
-
-def create_templatemsgs(project_version, pot_catalog, commit=True):
-    entries = []
-    for message in pot_catalog:
-        if message.id:
-            #print message.id
-            flags = json.dumps(list(message.flags))
-            locations = json.dumps(message.locations)
-            entries.append(TemplateMsg(project_version=project_version, message=message.id, locations=locations, flags=flags))
-        
-    if commit:
-        TemplateMsg.objects.bulk_create(entries)
-        
-    return entries
 
 
 class ProjectForm(forms.ModelForm):
@@ -72,23 +58,9 @@ class ProjectForm(forms.ModelForm):
         project.save()
         
         # Create a the first project_version
-        self.create_new_version(project, 1)
+        create_new_version(project, 1, self.uploaded_catalog)
             
         return project
-    
-    def create_new_version(self, project, version):
-        """
-        Open a new version for a project and fill it with datas from the given 
-        POT file
-        """
-        project_version = project.projectversion_set.create(
-            version = version,
-            header_comment = self.uploaded_catalog.header_comment,
-            mime_headers = json.dumps(dict(self.uploaded_catalog.mime_headers)),
-        )
-        create_templatemsgs(project_version, self.uploaded_catalog)
-        
-        return project_version
 
     class Meta:
         model = Project
@@ -108,46 +80,11 @@ class ProjectUpdateForm(ProjectForm):
         if commit:
             if self.uploaded_catalog:
                 previous_version = project.get_current_version()
-                current_version = self.create_new_version(project, previous_version.version+1)
-                self.update_catalogs(project, previous_version, current_version)
+                current_version = create_new_version(project, previous_version.version+1, self.uploaded_catalog)
+                update_catalogs(project, previous_version, current_version)
             project.save()
             
         return project
-
-    def update_catalogs(self, project, previous_version, current_version):
-        """
-        Recreate all existing catalogs from previous version in the current one, 
-        then update them from the given POT file
-        """
-        current_template = current_version.get_babel_template()
-        current_templatemsg_map = dict([(item.message, item) for item in current_version.templatemsg_set.all()])
-        
-        # For each existing catalog in previous project version
-        for previous_catalog in previous_version.catalog_set.all():
-            # Update previous catalog from the given POT file
-            current_babel_catalog = previous_catalog.get_babel_catalog()
-            current_babel_catalog.update(current_template)
-            
-            # New catalog for current version
-            current_catalog = current_version.catalog_set.create(
-                locale = previous_catalog.locale,
-                header_comment = current_version.header_comment,
-                mime_headers = current_version.mime_headers,
-            )
-            
-            # Add entries to the new catalog from template messages
-            entries = []
-            for template_id,template_instance in current_templatemsg_map.items():
-                message = ''
-                fuzzy = False
-                if template_id in current_babel_catalog:
-                    if current_babel_catalog[template_id].string:
-                        message = current_babel_catalog[template_id].string
-                    fuzzy = current_babel_catalog[template_id].fuzzy
-                entries.append(TranslationMsg(template=template_instance, catalog=current_catalog, message=message, fuzzy=fuzzy))
-            
-            # Bulk saving entries
-            TranslationMsg.objects.bulk_create(entries)
 
 
 class CatalogForm(forms.ModelForm):

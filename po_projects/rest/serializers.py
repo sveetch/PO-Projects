@@ -10,6 +10,7 @@ from babel.messages.pofile import read_po
 from rest_framework import serializers
 
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
+from po_projects.utils import create_templatemsgs, create_new_version, update_catalogs
 
 class VersionSerializer(serializers.ModelSerializer):
     """
@@ -52,10 +53,6 @@ class ProjectCurrentSerializer(ProjectVersionSerializer):
         view_name='po_projects:api-project-detail',
         lookup_field='slug'
     )
-    #pot_update = serializers.HyperlinkedIdentityField(
-        #view_name='po_projects:api-project-pot-update',
-        #lookup_field='slug'
-    #)
     projectversion_set = VersionSerializer(
         many=True, read_only=True,
     )
@@ -70,35 +67,33 @@ class ProjectCurrentSerializer(ProjectVersionSerializer):
         """
         Validation for the given POT content
         """
-        #print "check valid pot file"
         value = attrs[source]
         if value:
             try:
                 template_file = StringIO()
-                template_file.write(value)
+                template_file.write(value.encode('UTF8'))
                 template_file.seek(0)
                 # Seems the validation from read_po is too much minimalistic
                 # This does not really valid if the content is a real POT content
-                uploaded_catalog = read_po(template_file, ignore_obsolete=True)
+                self.uploaded_pot_file = read_po(template_file, ignore_obsolete=True)
             except:
                 raise serializers.ValidationError("Your file does not seem to be a valid POT file")
         return attrs
+
+    def save(self, **kwargs):
+        """
+        Override the save method to update template and catalog from the given POT
+        """
+        super(ProjectCurrentSerializer, self).save(**kwargs)
+        
+        if hasattr(self, 'uploaded_pot_file'):
+            previous_version = self.object.get_current_version()
+            current_version = create_new_version(self.object, previous_version.version+1, self.uploaded_pot_file)
+            update_catalogs(self.object, previous_version, current_version)
+            self.object.save()
+         
+        return self.object
     
     class Meta:
         model = Project
         fields = ('id', 'slug', 'name', 'description', 'url', 'tarball_url', 'pot', 'projectversion_set' )
-
-
-#class ProjectPotSerializer(ProjectVersionSerializer):
-    #"""
-    #Serializer for ``Project`` model to update from a POT file
-    #"""
-    #pot = serializers.HyperlinkedIdentityField(
-        #view_name='po_projects:api-project-pot-update',
-        #lookup_field='slug',
-        #write_only=True,
-    #)
-    
-    #class Meta:
-        #model = Project
-        #fields = ('id', 'slug', 'name', 'description', 'url', 'tarball_url', 'pot' )
