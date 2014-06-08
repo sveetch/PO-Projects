@@ -1,5 +1,6 @@
 .. _django-guardian: https://github.com/lukaszb/django-guardian
 .. _djangorestframework: http://www.django-rest-framework.org
+.. _PO-Projects-client: https://github.com/sveetch/PO-Projects-client
 
 **PO Projects** is a PO file management factory.
 
@@ -18,29 +19,14 @@ Features
 * Form to import a catalog (PO) to update a catalog;
 * Nice frontend with Foundation;
 * Permission restriction;
+* Restricted API access with `djangorestframework`_ to get PO files or global project 
+  archive from external tools (like Optimus or a Django app from an external site) ?
 
 Planned
 =======
 
-* Restricted API access with `djangorestframework`_ to get PO files or global project 
-  archive from external tools (like Optimus or a Django app from an external site) ?
 * User authoring to know who has done what;
 * More granual permission restriction with `django-guardian`_;
-
-External API access
-===================
-
-We should need of two clients : 
-
-* One for Django webapp, shipped as a Django app that only exposes a command line tool, no needs of model;
-* One for Optimus, allready shipped as a new command line tool;
-
-The access to the API need to be protected and restricted to avoid that anyone can download and/or edit project translations.
-
-API actions should be :
-
-* Export project, this will send a tarball containing the locale directory to overwrite the one in the destination project (in the django or optimus project, not the translation project stored in Po-Projects);
-* Receiving new POT file to update a project template and catalogs;
 
 Install
 =======
@@ -70,3 +56,46 @@ Finally mount its urls in your main ``urls.py`` : ::
         (r'^po/', include('po_projects.urls', namespace='po_projects')),
         ...
     )
+
+Also to enable the rest API you will have to install `djangorestframework`_ in your settings : ::
+
+    INSTALLED_APPS = (
+        ...
+        'rest_framework'
+        ...
+    )
+
+    REST_FRAMEWORK = {
+        'PAGINATE_BY': 10,
+        # Use hyperlinked styles by default.
+        # Only used if the `serializer_class` attribute is not set on a view.
+        'DEFAULT_MODEL_SERIALIZER_CLASS': (
+            'rest_framework.serializers.HyperlinkedModelSerializer',
+        ),
+
+        # Use Django's standard `django.contrib.auth` permissions,
+        # or allow read-only access for unauthenticated users.
+        'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.IsAdminUser',
+            #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        ),
+    }
+
+And mount it in your ``urls.py`` : ::
+
+    urlpatterns = patterns('',
+        ...
+        (r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+        ...
+    )
+
+External API access
+===================
+
+If `djangorestframework`_ is installed, a rest API will be available on : ::
+
+    /po/rest/
+
+It is browsable for authenticated users with admin rights (``is_staff`` on True), also the client will need to access to the API with an user accounts with the admin rights.
+
+`PO-Projects-client`_ is client to use the API from your project.

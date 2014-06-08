@@ -18,7 +18,6 @@ from django.forms.models import modelformset_factory
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
-from babel.messages.pofile import read_po, write_po
 from babel.messages.catalog import Catalog as BabelCatalog
 
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg

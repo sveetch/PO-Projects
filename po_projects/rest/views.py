@@ -53,9 +53,11 @@ class ProjectCurrentDetail(ProjectDetailMixin, generics.RetrieveUpdateAPIView):
     
     * ``projectversion_set`` attribute will contains the project versions;
     * ``tarball_url`` attribute is a link to download a ZIP archive of PO files for the 
-      current project version;
+      current project version.
     
     ``projectversion_set`` urls use the version ID (pk), not the slug or version name.
+    
+    The view behind the tarball url accept one optionnal url argument ``kind`` that can be ``django`` or ``messages``, this will change the filename of the catalog files, because commonly with gettext the catalog file is named ``messages.po`` and with Django the catalog file is named ``django.po``. Default if not defined is to use the value from ``settings.DEFAULT_CATALOG_FILENAMES``.
     
     This view is a "Retrieve and update" view, so you can see and get project details 
     but also update its content.

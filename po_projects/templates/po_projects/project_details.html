@@ -29,7 +29,7 @@
     <ol>{% for item in project.get_current_version.templatemsg_set.all %}
         <li>
             <blockquote>
-                <p>{{ item.message|safe }}
+                <p>{{ item.message }}
                 {% comment %}<cite>{{ item.locations }}</cite>{% endcomment %}</p>
             </blockquote>
         </li>

@@ -18,7 +18,7 @@ from django.forms.models import modelformset_factory
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from extra_views import ModelFormSetView
 
-from babel.messages.pofile import read_po, write_po
+from babel.messages.pofile import write_po
 from babel.messages.catalog import Catalog as BabelCatalog
 
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
@@ -101,6 +101,15 @@ class CatalogMessagesFormView(LoginRequiredMixin, PermissionRequiredMixin, Model
 
     def get_project(self):
         return get_object_or_404(Project, slug=self.kwargs['slug'])
+        
+    def get_context_data(self, **kwargs):
+        context = super(CatalogMessagesFormView, self).get_context_data(**kwargs)
+        context.update({
+            'project': self.project,
+            'project_version': self.project_version,
+            'catalog': self.catalog,
+        })
+        return context
 
     def get_project_version(self):
         if "version" in self.kwargs:
