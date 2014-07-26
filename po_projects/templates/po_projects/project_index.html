@@ -10,8 +10,8 @@
                 <h4><a href="{% url 'po_projects:project-details' slug=project_item.slug %}">{{ project_item.name }}</a> <small>v{{ current_version.version }}</small></h4>
                 <p>{{ project_item.description }}</p>
                 <ul class="inline-list strong-items">
-                    <li><strong>{% trans "catalog" %} :</strong> {{ current_version.catalog_set.all.count }}</li>
-                    <li><strong>{% trans "message" %} :</strong> {{ current_version.templatemsg_set.all.count }}</li>
+                    <li><strong>{% trans "catalog" %} :</strong> {{ current_version.catalog_count }}</li>
+                    <li><strong>{% trans "message" %} :</strong> {{ current_version.message_count }}</li>
                 </ul>
             {% endwith %}</li>
         {% empty %}

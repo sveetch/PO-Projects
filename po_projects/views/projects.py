@@ -5,6 +5,7 @@ Page document views
 import json, os
 from cStringIO import StringIO
 
+#from django.db import models
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
@@ -31,9 +32,12 @@ class ProjectIndex(LoginRequiredMixin, generic.TemplateView):
     """
     template_name = "po_projects/project_index.html"
     
-    def get(self, request, *args, **kwargs):
-        context = {'project_list' : Project.objects.all().order_by('name')}
-        return self.render_to_response(context)
+    def get_context_data(self, **kwargs):
+        context = super(ProjectIndex, self).get_context_data(**kwargs)
+        context.update({
+            'project_list' : Project.objects.all().order_by('name'),
+        })
+        return context
 
 
 class ProjectCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
