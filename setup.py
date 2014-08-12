@@ -25,7 +25,7 @@ setup(
         'Babel==1.3',
         'django-braces>=1.2.0,<1.4',
         'django-extra-views',
-        'South >= 0.7.6',
+        'South >= 0.8.4',
         'autobreadcrumbs >= 1.0',
         'djangocodemirror==0.9.3',
         'django-crispy-forms >= 1.4.0',
