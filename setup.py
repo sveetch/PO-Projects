@@ -27,7 +27,7 @@ setup(
         'django-extra-views',
         'South >= 0.8.4',
         'autobreadcrumbs >= 1.0',
-        'djangocodemirror==0.9.3',
+        'djangocodemirror>=0.9.4',
         'django-crispy-forms >= 1.4.0',
         'crispy-forms-foundation >= 0.3.2',
         #'django-guardian >= 1.2',
