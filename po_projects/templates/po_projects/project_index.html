@@ -19,7 +19,7 @@
         {% endfor %}</ul>
     </div>
     
-    {% if perms.po_project.add_project %}<hr>
+    {% if perms.po_projects.add_project %}<hr>
     <p class="text-center">
         <a href="{% url 'po_projects:project-create' %}" class="button large">{% trans "Start a new project" %}</a>
     </p>{% endif %}
