@@ -1,12 +1,6 @@
-# Import from django
 from django.contrib import admin
-#from guardian.admin import GuardedModelAdmin
-
-# Import from here
 from .models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
 
-    
-#class ProjectAdmin(GuardedModelAdmin):
 class ProjectAdmin(admin.ModelAdmin):
     ordering = ('name',)
     search_fields = ('slug', 'name',)

@@ -14,7 +14,7 @@ Features
 * View to create new project from a PO/POT file;
 * View to create new project translation and edit them;
 * View to export project translations as PO files;
-* View to export an archive (zip/tarball) of all translations as PO files from a project;
+* View to export an archive (zip/tarball) of all translations as PO files (and their compiled MO files) from a project;
 * Manage fuzzy mode for translations;
 * Form to import a catalog (PO) to update a catalog;
 * Nice frontend with Foundation;

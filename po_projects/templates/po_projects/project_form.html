@@ -1,5 +1,5 @@
 {% extends "po_projects/base.html" %}
-{% load i18n crispy_forms_tags %}{% load url from future %}
+{% load i18n crispy_forms_tags %}
 {% block title %}{% if not project %}{% trans "Create a new project" %}{% else %}{% trans "Update project" %} {{ project.name }}{% endif %}{% endblock %}
 
 {% block content %}
