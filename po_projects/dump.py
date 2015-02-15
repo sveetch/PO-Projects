@@ -15,7 +15,7 @@ from django.conf import settings
 
 from po_projects.models import Project, Catalog
 
-def po_project_export(project, project_version, archive_fileobj, catalog_filename, compile_mo=True):
+def po_project_export(project, project_version, archive_fileobj, compile_mo=True):
     """
     Export all catalogs from a project into PO files with the good directory 
     structure
@@ -26,14 +26,19 @@ def po_project_export(project, project_version, archive_fileobj, catalog_filenam
     template_file = StringIO()
     write_po(template_file, project_version.get_babel_template(), sort_by_file=False, ignore_obsolete=True, include_previous=False)
     template_file.seek(0)
-    archive_files.append( (settings.POT_ARCHIVE_PATH.format(catalog_filename=catalog_filename), template_file) )
+    archive_files.append( (settings.POT_ARCHIVE_PATH.format(catalog_filename=project.domain), template_file) )
     
     # Catalog PO files
     for catalog in project_version.catalog_set.all():
-        po_file_path = settings.PO_ARCHIVE_PATH.format(locale=catalog.locale, catalog_filename=catalog_filename)
-        mo_file_path = settings.MO_ARCHIVE_PATH.format(locale=catalog.locale, catalog_filename=catalog_filename)
+        po_file_path = settings.PO_ARCHIVE_PATH.format(locale=catalog.locale, catalog_filename=project.domain)
+        mo_file_path = settings.MO_ARCHIVE_PATH.format(locale=catalog.locale, catalog_filename=project.domain)
         # Open a new catalog
         babel_catalog = catalog.get_babel_catalog()
+        
+        #print "="*40
+        #print "Processing locale:", babel_catalog.locale
+        #print "="*40
+        #print
         
         # Write the PO to a buffer string
         po_file = StringIO()
@@ -48,10 +53,17 @@ def po_project_export(project, project_version, archive_fileobj, catalog_filenam
         write_mo(mo_file, babel_catalog, use_fuzzy=False)
         mo_file.seek(0)
         
+        ## Some tests
         #from gettext import GNUTranslations
         #translations = GNUTranslations(fp=mo_file)
+        #for msg_item in babel_catalog:
+            #if msg_item.id and msg_item.string and not msg_item.fuzzy:
+                #print msg_item.id
+                #print "???", msg_item.string
+                #print ">>>", translations.ugettext(msg_item.id)
+                #print "-"*40
         #mo_file.seek(0)
-        
+            
         # Append the MO file to the archive manifest
         archive_files.append( (mo_file_path, mo_file) )
         

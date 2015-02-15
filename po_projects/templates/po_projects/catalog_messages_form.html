@@ -2,6 +2,57 @@
 {% load i18n crispy_forms_tags %}
 {% block title %}{{ catalog }} Edit messages{% endblock %}
 
+{% block foot_more_js %}{{ block.super }}
+<script type="text/javascript">
+//<![CDATA[
+$(document).ready(function($) {
+    var $form = $('.catalog-messages-form');
+    
+    $(".holder.checkbox > input", $form).mark_fuzzy_translation({
+        'status_fuzzy_label': "{% trans "Fuzzy" %}",
+        'status_enabled_label': "{% trans "Enabled" %}"
+    });
+    
+    $(".holder.checkbox > input, .holder.edit > textarea", $form).update_translation_stats({
+        'fuzzy_count_selector': '.holder.checkbox > input',
+        'empty_count_selector': '.holder.edit > textarea',
+        'fuzzy_value_selector': '.fixed-menu .po-trans-stats-fuzzy span.value',
+        'empty_value_selector': '.fixed-menu .po-trans-stats-empty span.value'
+    });
+    
+    $('.fixed-menu', $form).fixed_menu();
+});
+//]]>
+</script>
+{% endblock %}
+
+
 {% block content %}
-    {% crispy formset formset.form.helper %}
+{% comment %}     {% crispy formset formset.form.helper %} {% endcomment %}
+<form class="catalog-messages-form" method="post" action="."{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+    {% comment %}{% csrf_token %}{% endcomment %}
+    <dl class="button-holder sub-nav fixed-menu" id="fixed-stats-menu">
+        <dt style="display:none;">{% trans "Statistics" %}</dt>
+        <dd><span class="label info radius po-trans-stats-total">{% trans "Total" %}: <span class="value">{{ catalog.translationmsg_set.count }}</span></span></dd>
+        <dd><span class="label warning radius po-trans-stats-fuzzy">{% trans "Fuzzy" %}: <span class="value">{{ catalog.count_fuzzy_translations }}</span></span></dd>
+        <dd><span class="label secondary radius po-trans-stats-empty">{% trans "Empty" %}: <span class="value">{{ catalog.count_empty_translations }}</span></span></dd>
+        <dd class="right">
+            <input type="submit" id="submit-id-submit" class="button tiny" value="{% trans "Save" %}" name="submit">
+        </dd>
+    </dl>
+    
+    {{ formset.management_form|crispy }}
+    {% for form in formset %}
+        {% crispy form %}
+        {{ form.id }}
+    {% endfor %}
+    
+    <div class="button-holder panel clearfix">
+        <ul class="button-group right">
+            <li>
+                <input type="submit" id="submit-id-submit" class="button small" value="{% trans "Save" %}" name="submit">
+            </li>
+        </ul>
+    </div>
+</form>
 {% endblock %}

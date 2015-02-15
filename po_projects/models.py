@@ -19,6 +19,7 @@ import json
 from babel.core import Locale
 from babel.messages.catalog import Catalog as BabelCatalog
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -28,6 +29,7 @@ class Project(models.Model):
     """
     name = models.CharField(_('name'), max_length=150)
     slug = models.SlugField(_('slug'), unique=True, max_length=75)
+    domain = models.CharField(_('translation domain'), choices=settings.GETTEXT_DOMAINS, default=settings.DEFAULT_GETTEXT_DOMAINS, max_length=20)
     description = models.TextField(_('description'), blank=True)
 
     def __unicode__(self):
@@ -56,6 +58,7 @@ class ProjectVersion(models.Model):
         forged_catalog = BabelCatalog(
             header_comment=self.header_comment,
             project=self.project.name,
+            domain=self.project.domain,
             version=str(self.version)
         )
         
@@ -136,6 +139,7 @@ class Catalog(models.Model):
             locale=self.locale, 
             header_comment=self.header_comment,
             project=self.project_version.project.name,
+            domain=self.project_version.project.domain,
             version=str(self.project_version.version)
         )
         

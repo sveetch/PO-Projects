@@ -26,7 +26,6 @@ Planned
 =======
 
 * User authoring to know who has done what;
-* More granual permission restriction with `django-guardian`_;
 
 Install
 =======
@@ -98,4 +97,4 @@ If `djangorestframework`_ is installed, a rest API will be available on : ::
 
 It is browsable for authenticated users with admin rights (``is_staff`` on True), also the client will need to access to the API with an user accounts with the admin rights.
 
-`PO-Projects-client`_ is client to use the API from your project.
+`PO-Projects-client`_ is the client to use the API from your project.

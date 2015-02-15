@@ -1,6 +1,14 @@
 {% extends "skeleton.html" %}
 {% load autobreadcrumb %}
 
+{% block head_more_links %}{{ block.super }}
+    {% include "po_projects/include_css.html" %}
+{% endblock %}
+
+{% block head_base_js %}{{ block.super }}
+    {% include "po_projects/include_js.html" %}
+{% endblock %}
+
 {% block base_content %}<div class="row po_projects">
     <div class="small-12 columns">
         {% autobreadcrumbs_tag %}

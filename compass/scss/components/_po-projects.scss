@@ -1,0 +1,313 @@
+/*
+ * For PO-Projects
+ */
+@import "compass";
+
+// Common size/styles for all trans status
+$po-trans-border-size: $panel-border-size !default;
+$po-trans-border-style: $panel-border-style !default;
+
+// For fixed stats and submit menu
+$po-trans-menu-bg: $panel-bg !default;
+$po-trans-menu-border-color: darken($panel-bg, 5%) !default;
+
+// The tab box for the translation status (enabled, fuzzy, ..)
+$po-trans-status-font-size: 11px !default;
+$po-trans-status-vertical-padding: 4px !default;
+$po-trans-status-height: $po-trans-status-font-size + $po-trans-status-vertical-padding !default;
+
+// Colors for enabled status
+$po-trans-enabled-color: lighten($primary-color, 15%) !default;
+$po-trans-enabled-font-color: $panel-font-color !default;
+$po-trans-enabled-tab-font-color: #fff !default;
+$po-trans-enabled-bg: darken($po-trans-enabled-color, 5%) !default;
+$po-trans-enabled-border-color: darken($primary-color, 5%) !default;
+$po-trans-enabled-source-border-color: darken($po-trans-enabled-color, 5%) !default;
+$po-trans-enabled-source-bg: lighten($primary-color, 60%) !default;
+$po-trans-enabled-textarea-border-color: darken($po-trans-enabled-border-color, 10%) !default;
+
+// Colors for disabled status
+$po-trans-disabled-color: $panel-bg !default;
+$po-trans-disabled-font-color: lighten($panel-font-color, 20%) !default;
+$po-trans-disabled-tab-font-color: $panel-font-color !default;
+$po-trans-disabled-bg: $panel-bg !default;
+$po-trans-disabled-border-color: darken($panel-bg, 5%) !default;
+$po-trans-disabled-source-border-color: darken($panel-bg, 5%) !default;
+$po-trans-disabled-source-bg: lighten($panel-bg, 60%) !default;
+$po-trans-disabled-textarea-border-color: darken($po-trans-disabled-border-color, 10%) !default;
+
+// Colors for fuzzy status
+$po-trans-fuzzy-color: lighten($warning-color, 15%) !default;
+$po-trans-fuzzy-font-color: $panel-font-color !default;
+$po-trans-fuzzy-tab-font-color: $panel-font-color !default;
+$po-trans-fuzzy-bg: darken($po-trans-fuzzy-color, 5%) !default;
+$po-trans-fuzzy-border-color: darken($warning-color, 5%) !default;
+$po-trans-fuzzy-source-border-color: darken($po-trans-fuzzy-color, 5%) !default;
+$po-trans-fuzzy-source-bg: lighten($warning-color, 45%) !default;
+$po-trans-fuzzy-textarea-border-color: darken($po-trans-fuzzy-border-color, 10%) !default;
+
+.catalog-messages-form{
+    /*
+     * Translation statistics and submit menu
+     */
+    .fixed-menu{
+        margin: 0;
+        background-color: $po-trans-menu-bg;
+        border:$po-trans-border-size $po-trans-border-style $po-trans-menu-border-color;
+        @include border-bottom-radius($global-radius);
+        
+        &.fixed-menu-clone{
+            margin: 0 auto;
+            width: 100%;
+            max-width: $row-width;
+            border-top: 0;
+        }
+        
+        &>dd{
+            margin: 0;
+            padding: rem-calc(5px);
+            
+            &+dd{
+                margin-left: rem-calc(10px);
+            }
+            
+            .label{
+                margin-bottom: 0;
+            }
+            .button{
+                margin-bottom: 0;
+            }
+        }
+    }
+    
+    .row-wrapper{
+        margin-top: rem-calc(15px);
+        
+        .anchor{
+            @extend .clearfix;
+            a{
+                float: right;
+                display: block;
+                font-size: rem-calc(12px);
+                line-height: 1;
+                padding: rem-calc(3px);
+            }
+        }
+        
+        .message-row,
+        .message-row.enabled{
+            position: relative;
+            font-style: normal;
+            
+            &:first-child{
+                margin-top: 0;
+            }
+            &+hr{
+                display: none;
+            }
+            
+            /*
+            * Default layout elements for enabled translation (=not fuzzy)
+            */
+            // Label and checkbox for fuzzy option
+            &>.fuzzy-field{
+                display: inline-block;
+                position: absolute;
+                top: 0;
+                left: $po-trans-status-height;
+                
+                &>.holder.checkbox{
+                    padding: rem-calc($po-trans-status-vertical-padding) rem-calc($po-trans-status-vertical-padding) rem-calc(2px);
+                    position: relative;
+                    right: -1px;
+                    color: $po-trans-enabled-tab-font-color;
+                    line-height: rem-calc($po-trans-status-font-size);
+                    background-color: $po-trans-enabled-bg;
+                    border:$po-trans-border-size $po-trans-border-style $po-trans-enabled-border-color;
+                    border-top:$po-trans-border-size solid $po-trans-enabled-bg;
+                    @include border-bottom-radius($global-radius);
+                    @include rotate(90deg);
+                    @include transform-origin(left, top, false);
+
+                    input, label{
+                        margin: 0;
+                        padding: 0;
+                        color: inherit;
+                    }
+                    
+                    input{
+                        display: none;
+                    }
+                    
+                    label{
+                        margin-bottom: rem-calc(2px);
+                        font-size: rem-calc($po-trans-status-font-size);
+                        font-weight: bold;
+                        line-height: 1;
+                        text-transform: uppercase;
+                        @include rotate(180deg);
+                        @include transform-origin(center, center, false);
+                        
+                        &:after{
+                            margin-left: rem-calc(1px);
+                            font-family: 'icomoon';
+                            speak: none;
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                            @extend .icon-toggle-on:before;
+                            text-decoration: none;
+                        }
+                        &:hover{
+                            text-decoration: underline;
+                        }
+                    }
+                }
+            }
+            // Content
+            &>.flex-container{
+                margin-left: $po-trans-status-height;
+                padding: rem-calc(1px);
+                align-items: stretch;
+                background-color: $po-trans-enabled-bg;
+                border:$po-trans-border-size $po-trans-border-style $po-trans-enabled-border-color;
+                
+                &>.flex-item{
+                    display: flex;
+                    align-items: stretch;
+                    
+                    label{
+                        display: none;
+                    }
+                    
+                    // Message source
+                    &.source{
+                        margin-right: rem-calc(2.5px);
+                        padding: rem-calc(4px);
+                        flex-direction: column;
+                        font-size: rem-calc(12px);
+                        font-family: monospace;
+                        //color: $po-trans-enabled-font-color;
+                        border:$po-trans-border-size $po-trans-border-style $po-trans-enabled-source-border-color;
+                        background-color: $po-trans-enabled-source-bg;
+                        
+                        p{
+                            margin-bottom: rem-calc(12px);
+                            font-size: inherit;
+                            color: inherit;
+                            
+                            &:last-child{
+                                margin-bottom: 0;
+                            }
+                        }
+                    }
+                    
+                    // Message textarea
+                    &.edit{
+                        margin-left: rem-calc(2.5px);
+                        textarea{
+                            display: block;
+                            padding: rem-calc(4px);
+                            margin-bottom: 0;
+                            font-size: rem-calc(12px);
+                            font-family: monospace;
+                            border-color: $po-trans-enabled-textarea-border-color;
+                        }
+                    }
+                }
+            }
+            
+            /*
+            * Changing colors When the row is empty
+            */
+            &.disabled{
+                &>.fuzzy-field > .holder.checkbox{
+                    color: $po-trans-disabled-tab-font-color;
+                    background-color: $po-trans-disabled-bg;
+                    border:$po-trans-border-size $po-trans-border-style $po-trans-disabled-border-color;
+                    border-top:$po-trans-border-size solid $po-trans-disabled-bg;
+                    
+                    input, label{
+                        color: inherit;
+                    }
+                    
+                    label{
+                        font-weight: normal;
+                        &:after{
+                            @extend .icon-toggle-off:before;
+                        }
+                    }
+                }
+                &>.flex-container{
+                    background-color: $po-trans-disabled-bg;
+                    border:$po-trans-border-size $po-trans-border-style $po-trans-disabled-border-color;
+                    
+                    &>.flex-item{
+                        &.source{
+                            color: $po-trans-disabled-font-color;
+                            border:$po-trans-border-size $po-trans-border-style $po-trans-disabled-source-border-color;
+                            background-color: $po-trans-disabled-source-bg;
+                        }
+                    
+                        &.edit{
+                            textarea{
+                                border-color: $po-trans-disabled-textarea-border-color;
+                            }
+                        }
+                    }
+                }    
+            }
+            
+            /*
+            * Changing colors When the row is fuzzy
+            */
+            &.fuzzy{
+                &>.fuzzy-field > .holder.checkbox{
+                    color: $po-trans-fuzzy-tab-font-color;
+                    background-color: $po-trans-fuzzy-bg;
+                    border:$po-trans-border-size $po-trans-border-style $po-trans-fuzzy-border-color;
+                    border-top:$po-trans-border-size solid $po-trans-fuzzy-bg;
+                    
+                    input, label{
+                        color: inherit;
+                    }
+                    
+                    label{
+                        font-weight: normal;
+                        &:after{
+                            @extend .icon-toggle-off:before;
+                        }
+                    }
+                }
+                &>.flex-container{
+                    background-color: $po-trans-fuzzy-bg;
+                    border:$po-trans-border-size $po-trans-border-style $po-trans-fuzzy-border-color;
+                    
+                    &>.flex-item{
+                        &.source{
+                            color: $po-trans-fuzzy-font-color;
+                            border:$po-trans-border-size $po-trans-border-style $po-trans-fuzzy-source-border-color;
+                            background-color: $po-trans-fuzzy-source-bg;
+                        }
+                    
+                        &.edit{
+                            textarea{
+                                border-color: $po-trans-fuzzy-textarea-border-color;
+                            }
+                        }
+                    }
+                }    
+            }
+        }
+        
+    }
+    
+    // Bottom button panel
+    &>.button-holder.panel{
+        margin-top: rem-calc(14px);
+        
+        .button{
+            margin: 0;
+        }
+    }
+
+}

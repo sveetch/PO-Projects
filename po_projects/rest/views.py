@@ -11,7 +11,7 @@ from rest_framework import status, viewsets, generics, renderers
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 
-from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
+from po_projects.models import Project, ProjectVersion
 from po_projects.rest.serializers import ProjectCurrentSerializer, ProjectVersionSerializer
 from po_projects.mixins import DownloadMixin
 from po_projects.dump import po_project_export
@@ -88,8 +88,6 @@ class ProjectVersionDetail(APIView):
 class ProjectArchive(ProjectDetailMixin, DownloadMixin, APIView):
     """
     Send a ZIP archive for the project's PO files
-    
-    TODO: share code from a mixin using code from ProjectExportView
     """
     content_type = 'application/x-gzip'
     filename_format = "{project_slug}_{timestamp}.tar.gz"
@@ -119,6 +117,6 @@ class ProjectArchive(ProjectDetailMixin, DownloadMixin, APIView):
     def get_content(self, context):
         archive_file = StringIO()
         
-        po_project_export(self.object, self.object.get_current_version(), archive_file, catalog_filename=self.get_catalog_kind())
+        po_project_export(self.object, self.object.get_current_version(), archive_file)
         
         return archive_file.getvalue()

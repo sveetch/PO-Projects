@@ -19,10 +19,10 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from extra_views import ModelFormSetView
 
 from babel.messages.pofile import write_po
-from babel.messages.catalog import Catalog as BabelCatalog
 
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
-from po_projects.forms import ProjectForm, CatalogUpdateForm, TranslationMsgForm
+from po_projects.forms.catalog import CatalogUpdateForm
+from po_projects.forms.translation import TranslationMsgForm
 from po_projects.mixins import DownloadMixin
 
 
@@ -128,12 +128,12 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
     View to export PO file from a catalog
     """
     content_type = 'text/x-gettext-translation'
-    filename_format = "messages_{locale_name}_{timestamp}.po"
+    filename_format = "{project.domain}_{locale_name}_{timestamp}.po"
 
     def get(self, request, *args, **kwargs):
         self.project = self.get_project()
         self.project_version = self.get_project_version()
-        self.object = self.get_object()
+        self.object = self.catalog = self.get_object()
         return super(CatalogMessagesExportView, self).get(request, *args, **kwargs)
     
     def get_project(self):
@@ -152,8 +152,8 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
         context.update({
             'project': self.project,
             'project_version': self.project_version,
-            'catalog': self.object,
-            'locale_name': self.object.locale,
+            'catalog': self.catalog,
+            'locale_name': self.catalog.locale,
             'timestamp': self.get_filename_timestamp(),
         })
         return context
@@ -162,7 +162,7 @@ class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View)
         return self.filename_format.format(**context)
     
     def get_content(self, context):
-        forged_catalog = self.object.get_babel_catalog()
+        forged_catalog = self.catalog.get_babel_catalog()
             
         fpw = StringIO.StringIO()
         write_po(fpw, forged_catalog, sort_by_file=False, ignore_obsolete=True, include_previous=False)

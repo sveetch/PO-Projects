@@ -19,10 +19,9 @@ from django.forms.models import modelformset_factory
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
-from babel.messages.catalog import Catalog as BabelCatalog
-
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
-from po_projects.forms import ProjectForm, ProjectUpdateForm, CatalogForm, TranslationMsgForm
+from po_projects.forms.project import ProjectForm, ProjectUpdateForm
+from po_projects.forms.catalog import CatalogForm
 from po_projects.mixins import DownloadMixin
 from po_projects.dump import po_project_export
 
@@ -127,7 +126,7 @@ class ProjectExportView(LoginRequiredMixin, DownloadMixin, generic.View):
             return get_object_or_404(ProjectVersion, project=self.object, version=self.kwargs['version'])
         return self.object.get_current_version()
 
-    def get_catalog_kind(self):
+    def get_domain(self):
         kind = self.request.GET.get('kind', settings.DEFAULT_CATALOG_FILENAMES)
         if kind not in settings.AVAILABLE_CATALOG_FILENAMES:
             return settings.DEFAULT_CATALOG_FILENAMES
@@ -148,7 +147,7 @@ class ProjectExportView(LoginRequiredMixin, DownloadMixin, generic.View):
     def get_content(self, context):
         archive_file = StringIO()
         
-        po_project_export(self.object, self.project_version, archive_file, catalog_filename=self.get_catalog_kind())
+        po_project_export(self.object, self.project_version, archive_file)
         
         return archive_file.getvalue()
 
