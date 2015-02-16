@@ -77,3 +77,7 @@ class ProjectUpdateForm(ProjectForm):
             project.save()
             
         return project
+
+    class Meta:
+        model = Project
+        exclude = ('slug',)

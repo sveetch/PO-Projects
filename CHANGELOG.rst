@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.7.1 - 16 February 2015
+--------------------------------
+
+* Better translation source rendering in the translation update form;
+* Remove the Project's slug field from the project update form;
+
 Version 0.7.0 - 15 February 2015
 --------------------------------
 

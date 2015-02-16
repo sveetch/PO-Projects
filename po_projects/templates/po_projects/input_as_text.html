@@ -1,5 +1,5 @@
 <div id="div_{{ field.auto_id }}">
     {{ field.label_tag }}
-    <div class="content">{{ field.form.instance.template.message|linebreaks }}</div>
+    <div class="content">{% comment %}{{ field.form.instance.template.message|linebreaks }}{% endcomment %}{{ source_content|safe }}</div>
     <input type="hidden" name="{{ field.html_name }}" value="{% if field.value %}{{ field.value }}{% endif %}">
 </div>

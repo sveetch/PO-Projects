@@ -193,11 +193,19 @@ $po-trans-fuzzy-textarea-border-color: darken($po-trans-fuzzy-border-color, 10%)
                         p{
                             margin-bottom: rem-calc(12px);
                             font-size: inherit;
+                            line-height: rem-calc(17px);
                             color: inherit;
+                            white-space: pre-wrap;
                             
                             &:last-child{
                                 margin-bottom: 0;
                             }
+                        }
+                        
+                        // Explicit mark for carriage return
+                        .explicit_cr {
+                            color: black;
+                            font-weight: bold;
                         }
                     }
                     
@@ -210,6 +218,7 @@ $po-trans-fuzzy-textarea-border-color: darken($po-trans-fuzzy-border-color, 10%)
                             margin-bottom: 0;
                             font-size: rem-calc(12px);
                             font-family: monospace;
+                            line-height: rem-calc(17px);
                             border-color: $po-trans-enabled-textarea-border-color;
                         }
                     }
