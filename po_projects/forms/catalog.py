@@ -24,6 +24,8 @@ from po_projects.utils import create_templatemsgs, create_new_version, update_ca
 
 class CatalogForm(CrispyFormMixin, forms.ModelForm):
     """Catalog base Form"""
+    crispy_form_helper_path = 'po_projects.forms.crispies.inline_catalog_helper'
+    
     def __init__(self, author=None, project_version=None, *args, **kwargs):
         self.author = author
         self.project_version = project_version
@@ -82,6 +84,8 @@ class CatalogForm(CrispyFormMixin, forms.ModelForm):
 
 class CatalogUpdateForm(CatalogForm):
     """Catalog update Form"""
+    crispy_form_helper_path = None
+    
     po_file = forms.FileField(label=_('PO File'), required=False, help_text='Upload a valid PO file to update catalog messages, it will only update allready existing messages from the template, it does not add new message or remove existing messages. Be careful this will overwrite previous translations.')
     
     def __init__(self, author=None, project_version=None, *args, **kwargs):

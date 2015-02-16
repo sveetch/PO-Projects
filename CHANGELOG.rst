@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.7.2 - 16 February 2015
+--------------------------------
+
+* Better Catalog create form on project details page;
+
 Version 0.7.1 - 16 February 2015
 --------------------------------
 

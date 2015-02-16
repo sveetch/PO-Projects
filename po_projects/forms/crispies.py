@@ -108,3 +108,44 @@ def translation_helper(instance=None, prefix='', form_tag=False):
     #helper.add_input(Submit('submit', 'Submit'))
     
     return helper
+
+def inline_catalog_helper(instance=None, form_tag=True):
+    """
+    Form helper to create a new catalog
+    """
+    helper = FormHelper()
+    helper.form_action = '.'
+    helper.form_class = "hide-label left clearfix"
+    helper.attrs = {'data_abide': ''}
+    helper.form_tag = form_tag
+    
+    # Build the full layout
+    #helper.layout = Layout(
+        #Row(
+            #Column('locale', css_class='small-10'),
+            #Column(
+                #Submit(
+                    #'submit',
+                    #_('Create'),
+                    #css_class='postfix',
+                #),
+                #css_class='small-12'
+            #),
+            #css_class='collapse',
+        #)
+    #)
+    
+    helper.layout = Layout(
+        Field(
+            'locale',
+            placeholder=_("Type a locale like 'fr'"),
+            wrapper_class='left',
+        ),
+        Submit(
+            'submit',
+            _('Create a new catalog'),
+            css_class='tiny',
+        ),
+    )
+    
+    return helper
