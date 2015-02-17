@@ -3,16 +3,42 @@
 {% block title %}{% trans "Manage Catalog" %}{% endblock %}
 
 {% block content %}
+    {% with progress=catalog.get_progress %}<hr>
+    <dl>
+        <dt>{% trans "Locale code" %}</dt>
+        <dd>
+            <span>{{ catalog.locale }}</span>
+        </dd>
+        
+        <dt>{% trans "Progress" %}</dt>
+        <dd>
+            <div class="row">
+                <div class="column small-10 large-11">
+                    <div class="progress success radius">
+                        <span class="meter" style="width: {{ progress }}%"></span>
+                    </div>
+                </div>
+                <div class="column small-2 large-1">
+                    <span>{{ progress }}%</span>
+                </div>
+            </div>
+        </dd>
+        
+        <dt>{% trans "Statistics" %}</dt>
+        <dd>
+            <span>There is {{ catalog.translationmsg_set.count }} messages in the catalog, {{ catalog.count_empty_translations }} are empty and {{ catalog.count_fuzzy_translations }} are fuzzy.</span>
+        </dd>
+        
+        <dd class="clearfix">
+            <ul class="button-group stack-for-small radius right">
+                <li><a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Download PO" %}</a></li>
+                {% if perms.po_projects.edit_messages %}<li><a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a></li>{% endif %}
+            </ul>
+        </dd>
+    </dl>
+    {% endwith %}
+    
     {% if perms.po_projects.change_catalog %}<hr>
     <h3>{% trans "Edit infos" %}</h3>
     {% crispy form %}{% endif %}
-    
-    <hr>
-    <h3>{% trans "Messages" %}</h3>
-    <p>There is {{ catalog.translationmsg_set.count }} messages in the catalog, {{ catalog.count_empty_translations }} are empty and {{ catalog.count_fuzzy_translations }} are fuzzy.</p> 
-    
-    <p class="text-right">
-        <a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Download PO" %}</a>
-        {% if perms.po_projects.edit_messages %}<a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a>{% endif %}
-    </p>
 {% endblock %}

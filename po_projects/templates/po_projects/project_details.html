@@ -6,9 +6,23 @@
     <hr>
     <h3>{% trans "Catalogs" %}</h3>
     <ul class="list-group">{% for item in project_version.catalog_set.all %}
+    {% with progress=item.get_progress %}
         <li>
-            <h4><a href="{% url 'po_projects:catalog-details' slug=project.slug locale=item.locale %}">{{ item }}</a> <small>{{ item.locale }}</small></h4>
+            <div class="row">
+                <div class="column small-12 large-6">
+                    <h4><a href="{% url 'po_projects:catalog-details' slug=project.slug locale=item.locale %}">{{ item }}</a> <small>{{ item.locale }}</small></h4>
+                </div>
+                <div class="column small-10 large-5">
+                    <div class="progress success radius">
+                        <span class="meter" style="width: {{ progress }}%"></span>
+                    </div>
+                </div>
+                <div class="column small-2 large-1">
+                    <span>{{ progress }}%</span>
+                </div>
+            </div>
         </li>
+    {% endwith %}
     {% empty %}
         <li class="empty">There is no translation yet</li>
     {% endfor %}</ul>
@@ -32,14 +46,14 @@
     </div>
     
     
-    <hr>
+    {% comment %}<hr>
     <h3>{% trans "Messages to translate" %} ({{ project.get_current_version.templatemsg_set.count }})</h3>
     <ol>{% for item in project.get_current_version.templatemsg_set.all %}
         <li>
             <blockquote>
                 <p>{{ item.message }}
-                {% comment %}<cite>{{ item.locations }}</cite>{% endcomment %}</p>
+                <cite>{{ item.locations }}</cite></p>
             </blockquote>
         </li>
-    {% endfor %}</ol>
+    {% endfor %}</ol>{% endcomment %}
 {% endblock %}

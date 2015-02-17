@@ -131,6 +131,14 @@ class Catalog(models.Model):
         """Return a count of translations with message marked as fuzzy"""
         return self.translationmsg_set.filter(fuzzy=True).count()
 
+    def get_progress(self):
+        """
+        Return a percentage of progress (all filled item that are not fuzzy)
+        """
+        total = self.translationmsg_set.all().count()
+        filled = self.translationmsg_set.exclude(message="").exclude(fuzzy=True).count()
+        return (filled*100)/total
+
     def get_babel_catalog(self):
         """
         Return a babel catalog suitable for a PO file
