@@ -1,0 +1,146 @@
+/*
+ * Various common stuff
+ */
+.inline-list.strong-items{
+    margin-left: 0;
+    
+    &>:first-child { margin-left: 0; }
+    
+    strong{
+        display: inline;
+        text-transform: capitalize;
+    }
+}
+
+/*
+ * Panel customize
+ */
+.nice-tiles{
+    .columns .panel{
+        padding: 10px;
+        
+        &:hover{
+            $bg: scale-color($primary-color, $lightness: 94%);
+            background: $bg;
+            border-color: scale-color($bg, $lightness: $panel-function-factor);
+        }
+        
+        // Remove uneeded margins to direct descendant titles
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: $header-top-margin;
+            margin-bottom: $header-bottom-margin;
+        }
+        h3{
+            font-size: 22px;
+            text-transform: none;
+        }
+        h4{
+            font-size: 18px;
+            text-transform: none;
+        }
+    }
+}
+
+
+/*
+ * Bullet list items visually grouped like rows
+ */
+$list-group-color: #ffffff;
+
+ul.list-group{
+    margin-left: auto;
+    margin-right: auto;
+    list-style: none;
+    border: $hr-border-style $hr-border-color;
+    border-width: $hr-border-width;
+    @include radius($global-radius);
+    background-color: $list-group-color;
+    
+    >li{
+        padding: rem-calc(13px);
+        
+        &>.row{
+            margin: 0 rem-calc(-13px);
+        }
+        
+        &.empty{
+            text-align: center;
+        }
+        
+        &.current{
+            background-color: lighten($primary-color, 2%);
+            h3,h4,h5,p,a{
+                color: #ffffff;
+            }
+            &:hover{
+                background-color: lighten($primary-color, 5%);
+            }
+        }
+        
+        &+li{
+            border-top: $hr-border-width $hr-border-style $hr-border-color;
+        }
+        
+        &:hover{
+            background-color: darken($list-group-color, 5%);
+        }
+        
+        a{
+            color: $body-font-color;
+        }
+        
+        h3,h4,h5,h6,p.title{
+            margin: 0;
+            font-size: $paragraph-font-size + rem-calc(2);
+            font-weight: 600;
+        
+            small{
+                font-size: 0.75em;
+                color: lighten($body-font-color, 40%);
+            }
+            a{
+                color: $anchor-font-color;
+                &:hover{
+                    color: darken($anchor-font-color, 10%);
+                    text-decoration: underline;
+                }
+            }
+            &+*{
+                margin-top: rem-calc(7);
+            }
+        }
+        
+        >p{
+            margin-bottom: 0;
+            color: lighten($body-font-color, 15%);
+            
+            &+*{
+                margin-top: rem-calc(7);
+            }
+        }
+    }
+}
+
+/*
+ * Custom panel with a title and can nicely embed list-group
+ * 
+ * Designed to be an unique container to details some related items
+ */
+.panel-headed{
+    padding: 0;
+    
+    &>*{
+        padding: $panel-padding;
+    }
+    &>h3,&>h4,&>h5,&>h6,&>p.heading{
+        margin: 0;
+        background: $panel-bg;
+        border-bottom: $panel-border-size $panel-border-style scale-color($panel-bg, $lightness: $panel-function-factor);
+        @include side-radius(top, $global-radius);
+    }
+    ul.list-group{
+        border: none;
+        @include radius(0);
+        @include side-radius(bottom, $global-radius);
+    }
+}

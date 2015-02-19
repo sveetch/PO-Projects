@@ -320,3 +320,27 @@ $po-trans-fuzzy-textarea-border-color: darken($po-trans-fuzzy-border-color, 10%)
     }
 
 }
+
+/*
+ * Catalog table statistics
+ */
+.catalog-statistics{
+    width: 100%;
+    
+    .locale-code{
+        font-family: monospace;
+    }
+    
+    .sub-nav{
+        dd:first-of-type{
+            margin-left: 0;
+        }
+    }
+    
+    .progress{
+        margin-bottom: 0;
+    }
+    .progress-score{
+        font-size: 12px;
+    }
+}

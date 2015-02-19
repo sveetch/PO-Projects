@@ -84,9 +84,9 @@ class CatalogForm(CrispyFormMixin, forms.ModelForm):
 
 class CatalogUpdateForm(CatalogForm):
     """Catalog update Form"""
-    crispy_form_helper_path = None
+    crispy_form_helper_path = 'po_projects.forms.crispies.catalog_update_helper'
     
-    po_file = forms.FileField(label=_('PO File'), required=False, help_text='Upload a valid PO file to update catalog messages, it will only update allready existing messages from the template, it does not add new message or remove existing messages. Be careful this will overwrite previous translations.')
+    po_file = forms.FileField(label=_('PO File'), required=False, help_text=_('Upload a valid PO file to update catalog messages, it will only update allready existing messages from the template, it does not add new message or remove existing messages. Be careful this will overwrite previous translations.'))
     
     def __init__(self, author=None, project_version=None, *args, **kwargs):
         self.author = author
@@ -97,6 +97,8 @@ class CatalogUpdateForm(CatalogForm):
 
     def clean(self):
         cleaned_data = super(CatalogForm, self).clean()
+        
+        # TODO: Validate that modified locale code does not allready exists for the project
         
         if not self.author.has_perm('po_projects.change_catalog'):
             raise forms.ValidationError(_("You don't have permission to use this form"))
@@ -110,7 +112,7 @@ class CatalogUpdateForm(CatalogForm):
             try:
                 self.uploaded_catalog = read_po(data, ignore_obsolete=True)
             except:
-                raise forms.ValidationError("Your file does not seem to be a valid PO file")
+                raise forms.ValidationError(_("Your file does not seem to be a valid PO file"))
 
         return data
 

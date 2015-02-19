@@ -24,12 +24,18 @@ from po_projects.utils import create_templatemsgs, create_new_version, update_ca
 
 class ProjectForm(CrispyFormMixin, forms.ModelForm):
     """Project Form"""
-    po_file = forms.FileField(label=_('POT File'), required=True, help_text='Upload a valid POT file to initialize or update project strings to translate')
+    crispy_form_helper_path = 'po_projects.forms.crispies.project_helper'
+    
+    po_file = forms.FileField(label=_('POT File'), required=True, help_text=_('Upload a valid POT file to initialize or update project strings to translate'))
     
     def __init__(self, author=None, *args, **kwargs):
         self.author = author
         self.uploaded_catalog = None
         self.catalog_entries = []
+        
+        self.crispy_form_helper_kwargs.update({
+            'instance': kwargs.get('instance', None),
+        })
         
         super(ProjectForm, self).__init__(*args, **kwargs)
         super(forms.ModelForm, self).__init__(*args, **kwargs)
@@ -40,7 +46,7 @@ class ProjectForm(CrispyFormMixin, forms.ModelForm):
             try:
                 self.uploaded_catalog = read_po(data, ignore_obsolete=True)
             except:
-                raise forms.ValidationError("Your file does not seem to be a valid POT file")
+                raise forms.ValidationError(_("Your file does not seem to be a valid POT file"))
 
         return data
 
@@ -60,8 +66,6 @@ class ProjectForm(CrispyFormMixin, forms.ModelForm):
 class ProjectUpdateForm(ProjectForm):
     """Project Form for update"""
     def __init__(self, author=None, *args, **kwargs):
-        self.author = author
-        
         super(ProjectUpdateForm, self).__init__(author, *args, **kwargs)
         
         self.fields['po_file'].required = False

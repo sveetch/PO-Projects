@@ -4,41 +4,51 @@
 
 {% block content %}
     {% with progress=catalog.get_progress %}<hr>
-    <dl>
-        <dt>{% trans "Locale code" %}</dt>
-        <dd>
-            <span>{{ catalog.locale }}</span>
-        </dd>
-        
-        <dt>{% trans "Progress" %}</dt>
-        <dd>
-            <div class="row">
-                <div class="column small-10 large-11">
-                    <div class="progress success radius">
-                        <span class="meter" style="width: {{ progress }}%"></span>
+    <table class="catalog-statistics" role="grid">
+        <tbody>
+            <tr>
+                <th>{% trans "Locale code" %}</th>
+                <td>
+                    <span class="locale-code label secondary">{{ catalog.locale }}</span>
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans "Progress" %}</th>
+                <td>
+                    <div class="row">
+                        <div class="columns small-10 large-11">
+                            <div class="progress success radius">
+                                <span class="meter" style="width: {{ progress }}%"></span>
+                            </div>
+                        </div>
+                        <div class="columns small-2 large-1">
+                            <span class="progress-score">{{ progress }}%</span>
+                        </div>
                     </div>
-                </div>
-                <div class="column small-2 large-1">
-                    <span>{{ progress }}%</span>
-                </div>
-            </div>
-        </dd>
-        
-        <dt>{% trans "Statistics" %}</dt>
-        <dd>
-            <span>There is {{ catalog.translationmsg_set.count }} messages in the catalog, {{ catalog.count_empty_translations }} are empty and {{ catalog.count_fuzzy_translations }} are fuzzy.</span>
-        </dd>
-        
-        <dd class="clearfix">
-            <ul class="button-group stack-for-small radius right">
-                <li><a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Download PO" %}</a></li>
-                {% if perms.po_projects.edit_messages %}<li><a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a></li>{% endif %}
-            </ul>
-        </dd>
-    </dl>
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans "Statistics" %}</th>
+                <td>
+                    <dl class="sub-nav">
+                        <dt style="display:none;">{% trans "Statistics" %}</dt>
+                        <dd><span class="label info radius">{% trans "Total" %}: <span class="value">{{ catalog.translationmsg_set.count }}</span></span></dd>
+                        <dd><span class="label warning radius">{% trans "Fuzzy" %}: <span class="value">{{ catalog.count_fuzzy_translations }}</span></span></dd>
+                        <dd><span class="label secondary radius">{% trans "Empty" %}: <span class="value">{{ catalog.count_empty_translations }}</span></span></dd>
+                    </dl>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="clearfix">
+        <ul class="button-group stack-for-small radius right">
+            <li><a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Download PO" %}</a></li>
+            {% if perms.po_projects.edit_messages %}<li><a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a></li>{% endif %}
+        </ul>
+    </div>
     {% endwith %}
     
     {% if perms.po_projects.change_catalog %}<hr>
-    <h3>{% trans "Edit infos" %}</h3>
+    <h3>{% trans "Settings" %}</h3>
     {% crispy form %}{% endif %}
 {% endblock %}

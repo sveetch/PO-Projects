@@ -57,8 +57,6 @@ class ProjectCurrentDetail(ProjectDetailMixin, generics.RetrieveUpdateAPIView):
     
     ``projectversion_set`` urls use the version ID (pk), not the slug or version name.
     
-    The view behind the tarball url accept one optionnal url argument ``kind`` that can be ``django`` or ``messages``, this will change the filename of the catalog files, because commonly with gettext the catalog file is named ``messages.po`` and with Django the catalog file is named ``django.po``. Default if not defined is to use the value from ``settings.DEFAULT_CATALOG_FILENAMES``.
-    
     This view is a "Retrieve and update" view, so you can see and get project details 
     but also update its content.
     
@@ -95,12 +93,6 @@ class ProjectArchive(ProjectDetailMixin, DownloadMixin, APIView):
     def get(self, request, slug, format=None):
         self.object = self.get_object()
         return super(ProjectArchive, self).get(request)
-
-    def get_catalog_kind(self):
-        kind = self.request.GET.get('kind', settings.DEFAULT_CATALOG_FILENAMES)
-        if kind not in settings.AVAILABLE_CATALOG_FILENAMES:
-            return settings.DEFAULT_CATALOG_FILENAMES
-        return kind
 
     def get_context_data(self, **kwargs):
         context = super(ProjectArchive, self).get_context_data(**kwargs)

@@ -144,3 +144,36 @@ img.divider{
         flex: 1;
     }
 }
+
+/*
+ * Force tables to take full width
+ */
+table.full-width{
+    width: 100%;
+}
+
+/*
+ * Form addons
+ */
+// Recursively hide all contained labels
+.hide-label label{
+    display: none;
+}
+// Better input hints display
+form{
+    fieldset.no-legend{
+        legend{
+            display: none;
+        }
+    }
+    
+    input[type=file]{
+        @extend input[type="text"];
+        height: auto;
+    }
+    
+    .hint{
+        font-size: rem-calc(12px);
+        color: lighten(#000000, 15%);
+    }
+}

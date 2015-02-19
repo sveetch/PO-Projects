@@ -90,7 +90,6 @@ class ProjectDetails(LoginRequiredMixin, generic.CreateView):
         context.update({
             'project': self.project,
             'project_version': self.project_version,
-            'AVAILABLE_CATALOG_FILENAMES': settings.AVAILABLE_CATALOG_FILENAMES,
         })
         return context
 
@@ -125,12 +124,6 @@ class ProjectExportView(LoginRequiredMixin, DownloadMixin, generic.View):
         if "version" in self.kwargs:
             return get_object_or_404(ProjectVersion, project=self.object, version=self.kwargs['version'])
         return self.object.get_current_version()
-
-    def get_domain(self):
-        kind = self.request.GET.get('kind', settings.DEFAULT_CATALOG_FILENAMES)
-        if kind not in settings.AVAILABLE_CATALOG_FILENAMES:
-            return settings.DEFAULT_CATALOG_FILENAMES
-        return kind
 
     def get_context_data(self, **kwargs):
         context = super(ProjectExportView, self).get_context_data(**kwargs)

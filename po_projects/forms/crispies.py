@@ -12,7 +12,7 @@ from django.utils.html import escape
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.bootstrap import UneditableField
-from crispy_forms_foundation.layout import TEMPLATE_PACK, Layout, Row, Column, HTML, Div, Field, ButtonHolder, ButtonHolderPanel, ButtonGroup, Panel, Submit
+from crispy_forms_foundation.layout import TEMPLATE_PACK, Layout, Row, Column, HTML, Div, Fieldset, Field, ButtonHolder, ButtonHolderPanel, ButtonGroup, Panel, Submit
 
 def SimpleRowColumn(field, *args, **kwargs):
     """
@@ -52,6 +52,43 @@ class SourceTextField(UneditableField):
         context['source_content'] = self.linebreaks(form.instance.template.message)
 
         return super(SourceTextField, self).render(form, form_style, context, template_pack=TEMPLATE_PACK)
+
+
+def project_helper(instance=None, form_tag=True):
+    """
+    Project form helper
+    """
+    helper = FormHelper()
+    helper.form_action = '.'
+    helper.attrs = {'data_abide': ''}
+    helper.form_tag = form_tag
+    
+    fields = [SimpleRowColumn('name', css_class='small-12')]
+    if not instance:
+        fields.append(SimpleRowColumn('slug', css_class='small-12'))
+    fields = fields+[
+        SimpleRowColumn('domain', css_class='small-12'),
+        SimpleRowColumn('description', css_class='small-12'),
+        SimpleRowColumn('po_file', css_class='small-12'),
+    ]
+    
+    helper.layout = Layout(
+        Fieldset(
+            '',
+            *fields,
+            css_class='no-legend'
+        ),
+        ButtonHolderPanel(
+            Submit(
+                'submit',
+                _('Save'),
+            ),
+            css_class='text-right',
+        )
+    )
+    
+    return helper
+
 
 def translation_helper(instance=None, prefix='', form_tag=False):
     """
@@ -115,37 +152,58 @@ def inline_catalog_helper(instance=None, form_tag=True):
     """
     helper = FormHelper()
     helper.form_action = '.'
-    helper.form_class = "hide-label left clearfix"
+    helper.form_class = "hide-label"
     helper.attrs = {'data_abide': ''}
     helper.form_tag = form_tag
     
     # Build the full layout
-    #helper.layout = Layout(
-        #Row(
-            #Column('locale', css_class='small-10'),
-            #Column(
-                #Submit(
-                    #'submit',
-                    #_('Create'),
-                    #css_class='postfix',
-                #),
-                #css_class='small-12'
-            #),
-            #css_class='collapse',
-        #)
-    #)
+    helper.layout = Layout(
+        Row(
+            Field(
+                'locale', 
+                placeholder=_("Type a locale like 'fr'"), 
+                wrapper_class='small-10 columns'
+            ),
+            Column(
+                Submit(
+                    'submit',
+                    _('Create'),
+                    css_class='postfix',
+                ),
+                css_class='small-2'
+            ),
+            css_class='collapse postfix-radius',
+        )
+    )
+    
+    return helper
+
+def catalog_update_helper(instance=None, form_tag=True):
+    """
+    Form helper to update a catalog
+    """
+    helper = FormHelper()
+    helper.form_action = '.'
+    helper.attrs = {'data_abide': ''}
+    helper.form_tag = form_tag
     
     helper.layout = Layout(
-        Field(
-            'locale',
-            placeholder=_("Type a locale like 'fr'"),
-            wrapper_class='left',
+        Fieldset(
+            '',
+            Row(
+                Column('locale', css_class='small-12'),
+                Column('po_file', css_class='small-12'),
+            ),
+            css_class='no-legend',
         ),
-        Submit(
-            'submit',
-            _('Create a new catalog'),
-            css_class='tiny',
-        ),
+            ButtonHolderPanel(
+                Submit(
+                    'submit',
+                    _('Save'),
+                    css_class='small',
+                ),
+                css_class='text-right',
+            )
     )
     
     return helper

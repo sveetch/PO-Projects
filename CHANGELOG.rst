@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.7.3 - 19 February 2015
+--------------------------------
+
+* Better layout and ergonomy on all ressources;
+
 Version 0.7.2 - 16 February 2015
 --------------------------------
 

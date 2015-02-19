@@ -3,6 +3,7 @@
 {% block title %}{% trans "Create a new project" %}{% endblock %}
 
 {% block content %}
+    <h3 class="subheader">Version {{ project_version.version }}</h3>
     <hr>
     <h3>{% trans "Catalogs" %}</h3>
     <ul class="list-group">{% for item in project_version.catalog_set.all %}
@@ -28,18 +29,16 @@
     {% endfor %}</ul>
     
     <div class="row">
-        <div class="column large-6">
-            <div class="clearfix">
-                {% if perms.po_projects.add_catalog %}
-                {% comment %}<h4>{% trans "Add a new catalog" %}</h4>{% endcomment %}
-                {% crispy form %}{% endif %}
-            </div>
+        <div class="column large-5">
+            {% if perms.po_projects.add_catalog %}
+            {% comment %}<h4>{% trans "Add a new catalog" %}</h4>{% endcomment %}
+            {% crispy form %}{% endif %}
         </div>
-        <div class="column large-6">
+        <div class="column large-7">
             <div class="clearfix">
                 <ul class="button-group stack-for-small radius right">
                     <li><a href="{% url 'po_projects:project-download' slug=project.slug %}" class="button small">{% trans "Download full archive" %}</a></li>
-                    {% if perms.po_projects.change_project %}<li><a href="{% url 'po_projects:project-update' slug=project.slug %}" class="button small">{% trans "Edit options" %}</a></li>{% endif %}
+                    {% if perms.po_projects.change_project %}<li><a href="{% url 'po_projects:project-update' slug=project.slug %}" class="button small">{% trans "Settings" %}</a></li>{% endif %}
                 </ul>
             </div>
         </div>
