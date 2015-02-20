@@ -1,0 +1,289 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-19 04:07+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: crumbs.py:5
+msgid "PO Projects"
+msgstr ""
+
+#: crumbs.py:6 templates/po_projects/project_details.html:3
+#: templates/po_projects/project_form.html:3
+msgid "Create a new project"
+msgstr "Créer un projet"
+
+#: crumbs.py:7
+msgid "<small class=\"subhead\">Project</small> {{ project.name }}"
+msgstr "<small class=\"subhead\">Projet</small> {{ project.name }}"
+
+#: crumbs.py:8 templates/po_projects/catalog_details.html:52
+#: templates/po_projects/project_details.html:42
+msgid "Settings"
+msgstr "Paramètres"
+
+#: crumbs.py:10
+msgid "<small class=\"subhead\">Catalog</small> {{ catalog.get_locale_name }}"
+msgstr ""
+"<small class=\"subhead\">Catalogue</small> {{ catalog.get_locale_name }}"
+
+#: crumbs.py:11 templates/po_projects/catalog_details.html:46
+msgid "Edit messages"
+msgstr "Éditer les messages"
+
+#: models.py:30
+msgid "name"
+msgstr "nom"
+
+#: models.py:31
+msgid "slug"
+msgstr "nom de raccourci"
+
+#: models.py:32
+msgid "translation domain"
+msgstr "domain de traduction"
+
+#: models.py:33
+msgid "description"
+msgstr ""
+
+#: models.py:42 models.py:49
+msgid "project"
+msgstr "projet"
+
+#: models.py:43
+msgid "projects"
+msgstr "projets"
+
+#: models.py:50
+msgid "version"
+msgstr ""
+
+#: models.py:51 models.py:116
+msgid "header comment"
+msgstr "entête de commentaire"
+
+#: models.py:52 models.py:117
+msgid "mime headers"
+msgstr "entêtes mime"
+
+#: models.py:74 models.py:81 models.py:114
+msgid "project version"
+msgstr "version de projet"
+
+#: models.py:75
+msgid "projects versions"
+msgstr "versions de projets"
+
+#: models.py:82
+msgid "message id"
+msgstr "identifiant"
+
+#: models.py:83
+msgid "locations"
+msgstr "emplacements"
+
+#: models.py:84
+msgid "flags"
+msgstr "marqueurs"
+
+#: models.py:107
+msgid "template message"
+msgstr "gabarit de message"
+
+#: models.py:108
+msgid "templates messages"
+msgstr "gabarits de messages"
+
+#: models.py:115
+msgid "locale"
+msgstr ""
+
+#: models.py:161 models.py:172 templates/po_projects/project_index.html:13
+msgid "catalog"
+msgstr "catalogue"
+
+#: models.py:162
+msgid "catalogs"
+msgstr "catalogues"
+
+#: models.py:171
+msgid "row source"
+msgstr "source"
+
+#: models.py:173 templates/po_projects/project_index.html:14
+msgid "message"
+msgstr ""
+
+#: models.py:174
+msgid "fuzzy"
+msgstr ""
+
+#: models.py:175
+msgid "pluralizable"
+msgstr "plurialisable"
+
+#: models.py:176
+msgid "python_format"
+msgstr ""
+
+#: models.py:198
+msgid "translation message"
+msgstr "traduction de message"
+
+#: models.py:199
+msgid "translations messages"
+msgstr "traductions de messages"
+
+#: settings.py:14
+msgid "Default gettext's domain"
+msgstr "Domaine par défaut de Gettext"
+
+#: settings.py:15
+msgid "Django's domain"
+msgstr "Domaine de Django"
+
+#: forms/__init__.py:24
+msgid "Submit"
+msgstr "Soumettre"
+
+#: forms/catalog.py:56 forms/catalog.py:104
+msgid "You don't have permission to use this form"
+msgstr "Vous n'avez pas la permission d'utiliser ce formulaire"
+
+#: forms/catalog.py:89
+msgid "PO File"
+msgstr "Fichier PO"
+
+#: forms/catalog.py:89
+msgid ""
+"Upload a valid PO file to update catalog messages, it will only update "
+"allready existing messages from the template, it does not add new message or "
+"remove existing messages. Be careful this will overwrite previous "
+"translations."
+msgstr ""
+"Transmettez un fichier PO valide pour mettre à jour les traductions, cela "
+"mettre à jour seulement les messages qui existaient déja dans le gabarit de "
+"traduction, cela n'ajoutera aucun nouveau message ni n'en supprimera. "
+"Prudence, ceci écrasera tout vos précédentes traductions."
+
+#: forms/catalog.py:115
+msgid "Your file does not seem to be a valid PO file"
+msgstr "Votre fichier ne semble pas être un fichier PO valide"
+
+#: forms/crispies.py:84 forms/crispies.py:202
+#: templates/po_projects/catalog_messages_form.html:42
+#: templates/po_projects/catalog_messages_form.html:55
+msgid "Save"
+msgstr "Enregistrer"
+
+#: forms/crispies.py:135
+msgid "Type your translation here else the original text will be used"
+msgstr "Rédiger votre traduction ici sinon le texte d'origine sera utilisé"
+
+#: forms/crispies.py:164
+msgid "Type a locale like 'fr'"
+msgstr "Entrez un nom de locale comme 'fr'"
+
+#: forms/crispies.py:170
+msgid "Create"
+msgstr "Créer"
+
+#: forms/project.py:29
+msgid "POT File"
+msgstr "Fichier POT"
+
+#: forms/project.py:29
+msgid ""
+"Upload a valid POT file to initialize or update project strings to translate"
+msgstr ""
+"Transmettez un fichier POT valide pour initialiser ou mettre à jour les "
+"textes à traduire du projet"
+
+#: forms/project.py:49
+msgid "Your file does not seem to be a valid POT file"
+msgstr "Votre fichier ne semble pas être un fichier POT valide"
+
+#: forms/translation.py:19 templates/po_projects/catalog_details.html:36
+#: templates/po_projects/catalog_messages_form.html:12
+#: templates/po_projects/catalog_messages_form.html:39
+msgid "Fuzzy"
+msgstr ""
+
+#: forms/translation.py:21 templates/po_projects/catalog_messages_form.html:13
+msgid "Enabled"
+msgstr "Activé"
+
+#: templates/po_projects/catalog_details.html:3
+msgid "Manage Catalog"
+msgstr "Gérer le catalogue"
+
+#: templates/po_projects/catalog_details.html:10
+msgid "Locale code"
+msgstr "Code de locale"
+
+#: templates/po_projects/catalog_details.html:16
+msgid "Progress"
+msgstr "Progression"
+
+#: templates/po_projects/catalog_details.html:31
+#: templates/po_projects/catalog_details.html:34
+#: templates/po_projects/catalog_messages_form.html:37
+msgid "Statistics"
+msgstr "Statistiques"
+
+#: templates/po_projects/catalog_details.html:35
+#: templates/po_projects/catalog_messages_form.html:38
+msgid "Total"
+msgstr ""
+
+#: templates/po_projects/catalog_details.html:37
+#: templates/po_projects/catalog_messages_form.html:40
+msgid "Empty"
+msgstr "Vide"
+
+#: templates/po_projects/catalog_details.html:45
+msgid "Download PO"
+msgstr "Télécharger le PO"
+
+#: templates/po_projects/project_details.html:8
+msgid "Catalogs"
+msgstr "Catalogues"
+
+#: templates/po_projects/project_details.html:41
+msgid "Download full archive"
+msgstr "Télécharger l'archive complète"
+
+#: templates/po_projects/project_form.html:3
+msgid "Update project"
+msgstr "Mettre à jour le projet"
+
+#: templates/po_projects/project_index.html:3
+msgid "Projects"
+msgstr "Projets"
+
+#: templates/po_projects/project_index.html:7
+msgid "Projects list"
+msgstr "Liste des projets"
+
+#: templates/po_projects/project_index.html:18
+msgid "There is no project yet"
+msgstr "Il n'y a encore aucun projet"
+
+#: templates/po_projects/project_index.html:24
+msgid "Start a new project"
+msgstr "Démarrer un nouveau projet"

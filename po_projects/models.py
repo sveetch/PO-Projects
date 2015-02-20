@@ -139,9 +139,12 @@ class Catalog(models.Model):
         filled = self.translationmsg_set.exclude(message="").exclude(fuzzy=True).count()
         return (filled*100)/total
 
-    def get_babel_catalog(self):
+    def get_babel_catalog(self, solid=False):
         """
         Return a babel catalog suitable for a PO file
+        
+        ``solid`` argument is a boolean to define if the catalog also store empty and 
+        fuzzy translation item (True) or drop them (False)
         """
         forged_catalog = BabelCatalog(
             locale=self.locale, 
@@ -151,7 +154,12 @@ class Catalog(models.Model):
             version=str(self.project_version.version)
         )
         
-        for entry in self.translationmsg_set.all().order_by('id'):
+        queryset = self.translationmsg_set.all()
+        # Exclude empty and fuzzy from queryset
+        if solid:
+            queryset = queryset.exclude(message="").exclude(fuzzy=True)
+        # Fill a Babel catalog from translation items
+        for entry in queryset.order_by('id'):
             locations = [tuple(item) for item in json.loads(entry.template.locations)]
             forged_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=entry.get_flags())
         

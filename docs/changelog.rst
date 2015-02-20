@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 0.7.4 - 20 February 2015
+--------------------------------
+
+* Add forgotten locale directory;
+* Fix bug on compiled PO in project's tarball archive so the client deploys correct PO and MO files;
+* Starting new documentation;
+
 Version 0.7.3 - 19 February 2015
 --------------------------------
 
