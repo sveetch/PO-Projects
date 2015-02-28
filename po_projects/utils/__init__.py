@@ -10,17 +10,36 @@ def create_templatemsgs(project_version, pot_catalog, commit=True):
     @pot_catalog: Babel Catalog instance
     """
     entries = []
+    # Walk in POT msg items to a template msg with its content
     for message in pot_catalog:
         if message.id:
-            #print message.id
-            flags = json.dumps(list(message.flags))
+            msgid = message.id
+            msgid_plural = ''
+            if isinstance(msgid, tuple) and message.pluralizable:
+                msgid, msgid_plural = message.id
+                
+            #print msgid
+            #print "* python_format:", message.python_format
+            #print "* pluralizable:", message.pluralizable
+            #if msgid_plural: print "  - msgid_plural:", msgid_plural
+            #print
+            
             locations = json.dumps(message.locations)
-            entries.append(TemplateMsg(project_version=project_version, message=message.id, locations=locations, flags=flags))
+            
+            entries.append( TemplateMsg(
+                project_version=project_version,
+                message=msgid,
+                plural_message=msgid_plural,
+                locations=locations,
+                pluralizable=message.pluralizable,
+                python_format=message.python_format,
+            ) )
         
     if commit:
         TemplateMsg.objects.bulk_create(entries)
         
     return entries
+
 
 def create_new_version(project, version, uploaded_catalog):
     """
@@ -39,6 +58,7 @@ def create_new_version(project, version, uploaded_catalog):
     create_templatemsgs(project_version, uploaded_catalog)
     
     return project_version
+
 
 def update_catalogs(project, previous_version, current_version):
     """

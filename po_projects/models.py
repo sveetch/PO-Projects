@@ -80,14 +80,16 @@ class TemplateMsg(models.Model):
     """
     project_version = models.ForeignKey(ProjectVersion, verbose_name=_('project version'), blank=False)
     message = models.TextField(_('message id'), blank=False)
+    plural_message = models.TextField(_('message plural id'), blank=True, default='')
     locations = models.TextField(_('locations'))
-    flags = models.TextField(_('flags'))
+    pluralizable = models.BooleanField(_('pluralizable'), default=False, blank=True)
+    python_format = models.BooleanField(_('python_format'), default=False, blank=True)
 
     def __unicode__(self):
         return self.message
 
     def get_truncated_message(self):
-        """Return truncated message to avoid message too long"""
+        """Return truncated message to avoid too long message"""
         if not self.message:
             return ''
         elif len(self.message) <= 50:
@@ -101,7 +103,9 @@ class TemplateMsg(models.Model):
 
     def get_flags_set(self):
         """Return a set from stored flags in JSON"""
-        return set(json.loads(self.flags))
+        if self.python_format:
+            return set(['python-format'])
+        return set([])
 
     class Meta:
         verbose_name = _('template message')
@@ -144,7 +148,7 @@ class Catalog(models.Model):
         Return a babel catalog suitable for a PO file
         
         ``solid`` argument is a boolean to define if the catalog also store empty and 
-        fuzzy translation item (True) or drop them (False)
+        fuzzy translation items (True) or drop them (False)
         """
         forged_catalog = BabelCatalog(
             locale=self.locale, 
@@ -198,8 +202,10 @@ class TranslationMsg(models.Model):
     def get_flags(self):
         """Return a set of flags computed from some model attributes"""
         flags = []
-        if self.fuzzy: flags.append('fuzzy')
-        if self.python_format: flags.append('python-format')
+        if self.fuzzy:
+            return flags.append('fuzzy')
+        if self.python_format:
+            return flags.append('python-format')
         return set(flags)
 
     class Meta:

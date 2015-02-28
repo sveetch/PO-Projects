@@ -2,25 +2,16 @@
 """
 Forms for po_projects projects
 """
-import json
-
 from django.conf import settings
 from django import forms
-from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
-from crispy_forms.helper import FormHelper
-from crispy_forms.bootstrap import UneditableField
-from crispy_forms_foundation.layout import Layout, Fieldset, Row, Column, ButtonHolder, Submit
-
-from babel import Locale
-from babel.core import UnknownLocaleError, get_locale_identifier
 from babel.messages.pofile import read_po
 
-from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
+from po_projects.models import Project
 from po_projects.forms import CrispyFormMixin
 
-from po_projects.utils import create_templatemsgs, create_new_version, update_catalogs
+from po_projects.utils import create_new_version, update_catalogs
 
 class ProjectForm(CrispyFormMixin, forms.ModelForm):
     """Project Form"""

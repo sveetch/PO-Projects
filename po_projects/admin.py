@@ -39,24 +39,23 @@ class CatalogAdmin(admin.ModelAdmin):
     
 class TemplateMsgAdmin(admin.ModelAdmin):
     ordering = ('project_version', 'message',)
-    list_filter = ('project_version',)
-    list_display = ('project_version', 'get_truncated_message',)
+    list_filter = ('project_version__project', 'pluralizable', 'python_format')
+    list_display = ('project_version', 'pluralizable', 'python_format', 'get_truncated_message',)
     raw_id_fields = ("project_version",)
-    search_fields = ('message',)
+    search_fields = ('message', 'plural_message')
     fieldsets = (
         (None, {
-            'fields': ('project_version', 'message')
+            'fields': ('project_version', 'message', 'plural_message')
         }),
         ('Metas', {
-            'classes': ('collapse',),
-            'fields': ('locations', 'flags')
+            'fields': ('locations', 'pluralizable', 'python_format')
         }),
     )
     
 class TranslationMsgAdmin(admin.ModelAdmin):
     ordering = ('catalog', 'message',)
-    list_filter = ('catalog',)
-    list_display = ('catalog', 'fuzzy', 'get_truncated_message',)
+    list_filter = ('catalog', 'fuzzy', 'pluralizable', 'python_format')
+    list_display = ('catalog', 'fuzzy', 'pluralizable', 'python_format', 'get_truncated_message',)
     list_display_links = ('catalog', 'get_truncated_message',)
     raw_id_fields = ("template","catalog",)
     search_fields = ('message',)
