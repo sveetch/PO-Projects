@@ -54,20 +54,20 @@ class TemplateMsgAdmin(admin.ModelAdmin):
     
 class TranslationMsgAdmin(admin.ModelAdmin):
     ordering = ('catalog', 'message',)
-    list_filter = ('catalog', 'fuzzy', 'pluralizable', 'python_format')
+    list_filter = ('catalog__project_version__project', 'fuzzy', 'pluralizable', 'python_format')
     list_display = ('catalog', 'fuzzy', 'pluralizable', 'python_format', 'get_truncated_message',)
     list_display_links = ('catalog', 'get_truncated_message',)
     raw_id_fields = ("template","catalog",)
-    search_fields = ('message',)
+    search_fields = ('message', 'plural_message')
     fieldsets = (
         (None, {
             'fields': ('template', 'catalog')
         }),
         ('Content', {
-            'fields': ('message', 'fuzzy')
+            'fields': ('message', 'plural_message')
         }),
         ('Options', {
-            'fields': ('pluralizable', 'python_format')
+            'fields': ('fuzzy', 'pluralizable', 'python_format')
         }),
     )
 

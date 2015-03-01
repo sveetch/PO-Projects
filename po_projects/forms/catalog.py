@@ -20,7 +20,7 @@ from babel.messages.pofile import read_po
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
 from po_projects.forms import CrispyFormMixin
 
-from po_projects.utils import create_templatemsgs, create_new_version, update_catalogs
+from po_projects.utils import get_message_strings, create_templatemsgs, create_new_version, update_catalogs
 
 class CatalogForm(CrispyFormMixin, forms.ModelForm):
     """Catalog base Form"""
@@ -96,17 +96,22 @@ class CatalogUpdateForm(CatalogForm):
         super(CatalogUpdateForm, self).__init__(author, project_version, *args, **kwargs)
 
     def clean(self):
+        """
+        TODO: Validate that modified locale code does not allready exists for the project
+        """
         cleaned_data = super(CatalogForm, self).clean()
-        
-        # TODO: Validate that modified locale code does not allready exists for the project
         
         if not self.author.has_perm('po_projects.change_catalog'):
             raise forms.ValidationError(_("You don't have permission to use this form"))
 
-        # Always return the full collection of cleaned data.
         return cleaned_data
 
     def clean_po_file(self):
+        """
+        Validate uploaded file using Babel
+        
+        Note that Babel validating is not the best because it takes pretty most all non-binaries as valid
+        """
         data = self.cleaned_data['po_file']
         if data:
             try:
@@ -119,19 +124,40 @@ class CatalogUpdateForm(CatalogForm):
     def save(self, commit=True):
         catalog = super(CatalogUpdateForm, self).save(commit=commit)
         
-        # Get all existing saved messages
+        # Get all existing saved messages and map them into a dict index on message id
         current_messages = dict([(item.template.message, item) for item in catalog.translationmsg_set.select_related('template').all()])
         
         if self.uploaded_catalog:
             uploaded_entries = []
+            
+            # Proceed for each PO catalog's message items
             for message in self.uploaded_catalog:
                 if message.id:
-                    # Update message if allready exist in database and if different from the source
-                    if message.id in current_messages and message.string != current_messages[message.id].message:
-                        current_messages[message.id].message = message.string
-                        current_messages[message.id].fuzzy = message.fuzzy
-                        current_messages[message.id].pluralizable = message.pluralizable
-                        current_messages[message.id].python_format = message.python_format
-                        current_messages[message.id].save()
+                    # If message item does indeed exists into the current db 
+                    # catalog
+                    if message.id in current_messages:
+                        changed = False
+                        
+                        # Find singular and plural message strings
+                        msgstr, msgstr_plural = get_message_strings(message.string)
+                            
+                        # Fill datas from uploaded content
+                        if message.string != current_messages[message.id].message:
+                            current_messages[message.id].message = msgstr
+                            current_messages[message.id].plural_message = msgstr_plural
+                            changed = True
+                        if message.fuzzy != current_messages[message.id].fuzzy:
+                            current_messages[message.id].fuzzy = message.fuzzy
+                            changed = True
+                        if message.pluralizable != current_messages[message.id].pluralizable:
+                            current_messages[message.id].pluralizable = message.pluralizable
+                            changed = True
+                        if message.python_format != current_messages[message.id].python_format:
+                            current_messages[message.id].python_format = message.python_format
+                            changed = True
+                            
+                        # Only perform a save if there is a real change
+                        if changed:
+                            current_messages[message.id].save()
         
         return catalog

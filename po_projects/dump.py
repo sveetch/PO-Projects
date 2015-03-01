@@ -20,7 +20,7 @@ def po_project_export(project, project_version, archive_fileobj, compile_mo=True
     Export all catalogs from a project into PO files with the good directory 
     structure
     
-    NOTE: One improvement would be to not do two queryset for each catalog (one for PO, one solid for MO)
+    NOTE: One improvement would be to not perform two querysets for each catalog (one for PO, one 'solid' for MO)
     """
     archive_files = []
     

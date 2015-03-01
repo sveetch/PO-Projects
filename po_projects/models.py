@@ -23,6 +23,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+
 class Project(models.Model):
     """
     Project container
@@ -41,6 +42,8 @@ class Project(models.Model):
     class Meta:
         verbose_name = _('project')
         verbose_name_plural = _('projects')
+
+
 
 class ProjectVersion(models.Model):
     """
@@ -74,42 +77,7 @@ class ProjectVersion(models.Model):
         verbose_name = _('project version')
         verbose_name_plural = _('projects versions')
 
-class TemplateMsg(models.Model):
-    """
-    Template catalog item, equivalent to a msg from a POT file
-    """
-    project_version = models.ForeignKey(ProjectVersion, verbose_name=_('project version'), blank=False)
-    message = models.TextField(_('message id'), blank=False)
-    plural_message = models.TextField(_('message plural id'), blank=True, default='')
-    locations = models.TextField(_('locations'))
-    pluralizable = models.BooleanField(_('pluralizable'), default=False, blank=True)
-    python_format = models.BooleanField(_('python_format'), default=False, blank=True)
 
-    def __unicode__(self):
-        return self.message
-
-    def get_truncated_message(self):
-        """Return truncated message to avoid too long message"""
-        if not self.message:
-            return ''
-        elif len(self.message) <= 50:
-            return self.message
-        return self.message[0:50]+' [...]'
-    get_truncated_message.short_description = 'Message'
-
-    def get_locations_set(self):
-        """Return a set from stored locations in JSON"""
-        return set([tuple(item) for item in json.loads(self.locations)])
-
-    def get_flags_set(self):
-        """Return a set from stored flags in JSON"""
-        if self.python_format:
-            return set(['python-format'])
-        return set([])
-
-    class Meta:
-        verbose_name = _('template message')
-        verbose_name_plural = _('templates messages')
 
 class Catalog(models.Model):
     """
@@ -148,7 +116,7 @@ class Catalog(models.Model):
         Return a babel catalog suitable for a PO file
         
         ``solid`` argument is a boolean to define if the catalog also store empty and 
-        fuzzy translation items (True) or drop them (False)
+        fuzzy translation items (True) or drop them (False, the default)
         """
         forged_catalog = BabelCatalog(
             locale=self.locale, 
@@ -176,6 +144,47 @@ class Catalog(models.Model):
             ('edit_messages', 'Edit messages'),
         )
 
+
+
+class TemplateMsg(models.Model):
+    """
+    Template catalog item, equivalent to a msg from a POT file
+    """
+    project_version = models.ForeignKey(ProjectVersion, verbose_name=_('project version'), blank=False)
+    message = models.TextField(_('message id'), blank=False)
+    plural_message = models.TextField(_('message plural id'), blank=True, default='')
+    locations = models.TextField(_('locations'))
+    pluralizable = models.BooleanField(_('pluralizable'), default=False, blank=True)
+    python_format = models.BooleanField(_('python_format'), default=False, blank=True)
+
+    def __unicode__(self):
+        return self.message
+
+    def get_truncated_message(self):
+        """Return truncated message to avoid too long message"""
+        if not self.message:
+            return ''
+        elif len(self.message) <= 50:
+            return self.message
+        return self.message[0:50]+' [...]'
+    get_truncated_message.short_description = 'Message'
+
+    def get_locations_set(self):
+        """Return a set from stored locations in JSON"""
+        return set([tuple(item) for item in json.loads(self.locations)])
+
+    def get_flags_set(self):
+        """Return a set from stored flags in JSON"""
+        if self.python_format:
+            return set(['python-format'])
+        return set([])
+
+    class Meta:
+        verbose_name = _('template message')
+        verbose_name_plural = _('templates messages')
+
+
+
 class TranslationMsg(models.Model):
     """
     Translation message from a catalog
@@ -183,9 +192,10 @@ class TranslationMsg(models.Model):
     template = models.ForeignKey(TemplateMsg, verbose_name=_('row source'), blank=False)
     catalog = models.ForeignKey(Catalog, verbose_name=_('catalog'), blank=False)
     message = models.TextField(_('message'), blank=True)
+    plural_message = models.TextField(_('message plural'), blank=True, default='')
     fuzzy = models.BooleanField(_('fuzzy'), default=False, blank=True)
     pluralizable = models.BooleanField(_('pluralizable'), default=False, blank=True)
-    python_format = models.BooleanField(_('python_format'), default=False, blank=True)
+    python_format = models.BooleanField(_('python format'), default=False, blank=True)
 
     def __unicode__(self):
         return self.message
