@@ -19,12 +19,14 @@ Features
 * View to create new project translation and edit them;
 * View to export project translations as PO files;
 * View to export an archive (zip/tarball) of all translations as PO files (and their compiled MO files) from a project;
-* Manage fuzzy mode for translations;
-* Form to import a catalog (PO) to update a catalog;
+* Manage fuzzy mode, python formatting and plurals for translations;
+* Form to import a catalog file (PO) to update a project's catalog;
 * Nice frontend with Foundation;
 * Permission restriction;
 * Restricted API access with `djangorestframework`_ to get PO files or global project 
-  archive from external tools (like Optimus or a Django app from an external site) ?
+  archive from external tools (like `PO-Projects-client`_) ?
+
+Actually there is only support for translation catalogs made for Python apps, with gettext module, Babel or Django.
 
 Links
 *****

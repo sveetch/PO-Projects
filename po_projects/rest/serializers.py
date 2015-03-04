@@ -10,7 +10,7 @@ from babel.messages.pofile import read_po
 from rest_framework import serializers
 
 from po_projects.models import Project, ProjectVersion
-from po_projects.utils import create_new_version, update_catalogs
+from po_projects.generators import create_new_version, update_catalogs
 
 class VersionSerializer(serializers.ModelSerializer):
     """

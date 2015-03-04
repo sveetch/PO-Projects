@@ -84,7 +84,7 @@ class CatalogMessagesFormView(LoginRequiredMixin, PermissionRequiredMixin, Model
     template_name = "po_projects/catalog_messages_form.html"
     model = TranslationMsg
     form_class = TranslationMsgForm
-    fields = ('template','fuzzy','message',)
+    fields = ('fuzzy','message','plural_message')
     extra = 0
 
     def get(self, request, *args, **kwargs):

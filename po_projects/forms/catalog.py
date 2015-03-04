@@ -20,7 +20,8 @@ from babel.messages.pofile import read_po
 from po_projects.models import Project, ProjectVersion, TemplateMsg, Catalog, TranslationMsg
 from po_projects.forms import CrispyFormMixin
 
-from po_projects.utils import get_message_strings, create_templatemsgs, create_new_version, update_catalogs
+from po_projects.utils import get_message_strings
+from po_projects.generators import create_templatemsgs, create_new_version, update_catalogs
 
 class CatalogForm(CrispyFormMixin, forms.ModelForm):
     """Catalog base Form"""
@@ -71,7 +72,14 @@ class CatalogForm(CrispyFormMixin, forms.ModelForm):
             if self.fill_messages:
                 entries = []
                 for row in self.project_version.templatemsg_set.all():
-                    entries.append(TranslationMsg(template=row, catalog=catalog, message=''))
+                    entries.append( TranslationMsg(
+                        template=row,
+                        catalog=catalog,
+                        pluralizable=row.pluralizable,
+                        python_format=row.python_format,
+                        message='',
+                        plural_message=''
+                    ) )
             
                 TranslationMsg.objects.bulk_create(entries)
             

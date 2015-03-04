@@ -35,5 +35,6 @@ class TranslationMsgForm(forms.ModelForm):
         exclude = ('catalog',)
         widgets = {
             'message': forms.Textarea(attrs={'rows': 3}),
+            'plural_message': forms.Textarea(attrs={'rows': 3}),
         }
 

@@ -12,7 +12,7 @@ from django.utils.html import escape
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.bootstrap import UneditableField
-from crispy_forms_foundation.layout import TEMPLATE_PACK, Layout, Row, Column, HTML, Div, Fieldset, Field, ButtonHolder, ButtonHolderPanel, ButtonGroup, Panel, Submit
+from crispy_forms_foundation.layout import TEMPLATE_PACK, Layout, Row, Column, HTML, Div, Fieldset, Field, ButtonHolder, ButtonHolderPanel, ButtonGroup, Panel, Submit, Hidden
 
 def SimpleRowColumn(field, *args, **kwargs):
     """
@@ -53,6 +53,26 @@ class SourceTextField(UneditableField):
 
         return super(SourceTextField, self).render(form, form_style, context, template_pack=TEMPLATE_PACK)
 
+class HiddenField(UneditableField):
+    """
+    Layout object for rendering template field value as hidden field
+    """
+    template = "po_projects/hidden_field.html"
+
+def source_formatter(value, autoescape=True):
+    """
+    Converts newlines into <p> and <br />s. Additionnaly add a carriage return 
+    character before each simple line break.
+    
+    Taken from ``django.utils.html.linebreaks`` then modified to fit needs.
+    """
+    value = normalize_newlines(value)
+    paras = re.split('\n{2,}', value)
+    if autoescape:
+        paras = ['<p>%s</p>' % escape(p).replace('\n', u'<span class="explicit_cr">↵</span><br />') for p in paras]
+    else:
+        paras = ['<p>%s</p>' % p.replace('\n', u'<span class="explicit_cr">↵</span><br />') for p in paras]
+    return '\n\n'.join(paras)
 
 def project_helper(instance=None, form_tag=True):
     """
@@ -140,14 +160,14 @@ def catalog_update_helper(instance=None, form_tag=True):
             ),
             css_class='no-legend',
         ),
-            ButtonHolderPanel(
-                Submit(
-                    'submit',
-                    _('Save'),
-                    css_class='small',
-                ),
-                css_class='text-right',
-            )
+        ButtonHolderPanel(
+            Submit(
+                'submit',
+                _('Save'),
+                css_class='small',
+            ),
+            css_class='text-right',
+        )
     )
     
     return helper
@@ -161,21 +181,65 @@ def translation_helper(instance=None, prefix='', form_tag=False):
     helper.form_action = '.'
     helper.form_class = 'catalog-messages-form'
     helper.form_tag = form_tag
-    helper.disable_csrf = True
+    helper.disable_csrf = True # Does not seems to have real effect
     helper.render_required_fields = True
     
+    # Define base css classes
     row_css_classes = ['message-row', 'clearfix']
-    if instance is not None and instance.fuzzy:
+    if instance.fuzzy:
         row_css_classes.append('fuzzy')
-    elif instance is not None and not instance.message:
+    elif not instance.message:
         row_css_classes.append('disabled empty')
     else:
         row_css_classes.append('enabled')
         
+    # Build anchor link and id
     anchor_link = ''
     if prefix:
         prefix_id = int(prefix[len('form-'):]) + 1
         anchor_link = '<a href="#item-{0}" id="item-{0}">#{0}</a>'.format(prefix_id)
+    
+    # Build messages, at least the singular message
+    message_contents = [Div(
+            Div(
+                HTML(
+                    source_formatter(instance.template.message)
+                ),
+                css_class='flex-item source',
+            ),
+            Field(
+                'message',
+                placeholder=_("Type your translation here else the original text will be used"),
+                wrapper_class='flex-item edit',
+            ),
+            css_class='flex-container',
+        ),
+        # Little trick to hide the field because formset requires the same 
+        # fields for all items
+        HiddenField('plural_message')
+    ]
+            
+    # If plural is enabled, build the plural message and append it
+    if instance.pluralizable:
+        row_css_classes.append('pluralizable')
+        # Remove hidden field
+        message_contents.pop()
+        # Append plural field
+        message_contents.append(Div(
+            Div(
+                HTML(
+                    source_formatter(instance.template.plural_message)
+                ),
+                css_class='flex-item source',
+            ),
+            Field(
+                'plural_message',
+                placeholder=_("Type your translation here else the original text will be used"),
+                wrapper_class='flex-item edit',
+            ),
+            css_class='flex-container',
+        ))
+
     
     helper.layout = Layout(
         Div(
@@ -188,23 +252,11 @@ def translation_helper(instance=None, prefix='', form_tag=False):
                     'fuzzy',
                     css_class='fuzzy-field',
                 ),
-                Div(
-                    Div(
-                        SourceTextField('template'),
-                        css_class='flex-item source',
-                    ),
-                    Field(
-                        'message',
-                        placeholder=_("Type your translation here else the original text will be used"),
-                        wrapper_class='flex-item edit',
-                    ),
-                    css_class='flex-container',
-                ),
-                css_class=' '.join(row_css_classes),
+                *message_contents,
+                css_class=' '.join(row_css_classes)
             ),
             css_class='row-wrapper',
         ),
     )
-    #helper.add_input(Submit('submit', 'Submit'))
     
     return helper

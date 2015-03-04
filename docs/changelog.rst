@@ -1,12 +1,15 @@
 Changelog
 =========
 
-Version 0.8.0 - Not yet released
---------------------------------
+Version 0.8.0 - 04 March 2015
+-----------------------------
 
 * Add ``pluralizable`` and ``python_format`` attributes to ``TemplateMsg`` model and fill them from messages flags;
 * Remove ``flags`` attributes from ``TemplateMsg`` model, now the flags are computed from model attributes (``python_format``);
 * Add ``plural_message`` attributes to ``TranslationMsg`` model filled when there is plural translation;
+* Update core to rightly use these new attributes (when creating/updating catalog);
+* Change catalog's translation form to fit with plural messages;
+* Add new south migrations for theses changes;
 
 Version 0.7.4 - 20 February 2015
 --------------------------------

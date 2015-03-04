@@ -23,6 +23,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from po_projects.utils import join_message_strings
 
 class Project(models.Model):
     """
@@ -58,6 +59,7 @@ class ProjectVersion(models.Model):
         """
         Return a babel template catalog suitable for a POT file
         """
+        # Forge babel catalog without locale (because it's a POT)
         forged_catalog = BabelCatalog(
             header_comment=self.header_comment,
             project=self.project.name,
@@ -65,8 +67,10 @@ class ProjectVersion(models.Model):
             version=str(self.version)
         )
         
+        # Add messages to the catalog with an empty string (because it's a POT)
         for entry in self.templatemsg_set.all().order_by('id'):
-            forged_catalog.add(entry.message, string=None, locations=entry.get_locations_set(), flags=entry.get_flags_set())
+            msgid = join_message_strings(entry.message, plural=entry.plural_message, pluralized=entry.pluralizable)
+            forged_catalog.add(msgid, string=None, locations=entry.get_locations_set(), flags=entry.get_flags_set())
         
         return forged_catalog
 
@@ -118,6 +122,7 @@ class Catalog(models.Model):
         ``solid`` argument is a boolean to define if the catalog also store empty and 
         fuzzy translation items (True) or drop them (False, the default)
         """
+        # Forge babel catalog
         forged_catalog = BabelCatalog(
             locale=self.locale, 
             header_comment=self.header_comment,
@@ -130,10 +135,24 @@ class Catalog(models.Model):
         # Exclude empty and fuzzy from queryset
         if solid:
             queryset = queryset.exclude(message="").exclude(fuzzy=True)
-        # Fill a Babel catalog from translation items
+            
+        # Add messages to the catalog using template message as "msgid" and 
+        # translation message as "msgstr" with supporting plural for both of them
         for entry in queryset.order_by('id'):
+            msgid = join_message_strings(entry.template.message, plural=entry.template.plural_message, pluralized=entry.template.pluralizable)
+            # Use template "pluralizable" attribute because it's the reference
+            msgstr = join_message_strings(entry.message, plural=entry.plural_message, pluralized=entry.template.pluralizable)
+            
+            # Decompile JSON value from template to get item locations
             locations = [tuple(item) for item in json.loads(entry.template.locations)]
-            forged_catalog.add(entry.template.message, string=entry.message, locations=locations, flags=entry.get_flags())
+            
+            # Push the item into catalog
+            forged_catalog.add(
+                msgid,
+                string=msgstr,
+                locations=locations,
+                flags=entry.get_flags()
+            )
         
         return forged_catalog
 
@@ -213,9 +232,9 @@ class TranslationMsg(models.Model):
         """Return a set of flags computed from some model attributes"""
         flags = []
         if self.fuzzy:
-            return flags.append('fuzzy')
+            flags.append('fuzzy')
         if self.python_format:
-            return flags.append('python-format')
+            flags.append('python-format')
         return set(flags)
 
     class Meta:

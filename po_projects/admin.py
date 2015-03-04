@@ -23,7 +23,7 @@ class ProjectVersionAdmin(admin.ModelAdmin):
     
 class CatalogAdmin(admin.ModelAdmin):
     ordering = ('project_version', 'locale',)
-    list_filter = ('project_version',)
+    list_filter = ('project_version__project',)
     list_display = ('project_version', 'locale',)
     list_display_links = ('project_version', 'locale',)
     raw_id_fields = ("project_version",)

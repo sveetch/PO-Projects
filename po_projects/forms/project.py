@@ -11,7 +11,7 @@ from babel.messages.pofile import read_po
 from po_projects.models import Project
 from po_projects.forms import CrispyFormMixin
 
-from po_projects.utils import create_new_version, update_catalogs
+from po_projects.generators import create_new_version, update_catalogs
 
 class ProjectForm(CrispyFormMixin, forms.ModelForm):
     """Project Form"""
