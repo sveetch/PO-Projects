@@ -7734,11 +7734,11 @@ ul li ol {
   margin-bottom: 0;
 }
 /* line 353, ../../../../../foundation5/bower_components/foundation/scss/foundation/components/_type.scss */
-ul.square li ul, ul.circle li ul, ul.disc li ul {
+ul.square li ul, .catalog-messages-form .row-wrapper .locations ul li ul, ul.circle li ul, ul.disc li ul {
   list-style: inherit;
 }
 /* line 356, ../../../../../foundation5/bower_components/foundation/scss/foundation/components/_type.scss */
-ul.square {
+ul.square, .catalog-messages-form .row-wrapper .locations ul {
   list-style-type: square;
   margin-left: 1.1rem;
 }
@@ -9104,16 +9104,41 @@ th.hide-for-touch {
  * PO-Projects icon set from icomoon
  */
 /* line 4, ../../../compass/scss/components/_po-projects_webfont.scss */
-.icon-toggle-off:before, .catalog-messages-form .row-wrapper .message-row.disabled > .fuzzy-field > .holder.checkbox label:after,
-.catalog-messages-form .row-wrapper .message-row.enabled.disabled > .fuzzy-field > .holder.checkbox label:after, .catalog-messages-form .row-wrapper .message-row.fuzzy > .fuzzy-field > .holder.checkbox label:after,
-.catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .fuzzy-field > .holder.checkbox label:after {
-  content: "\f204";
+.icon-cog:before {
+  content: "\e604";
 }
 
 /* line 8, ../../../compass/scss/components/_po-projects_webfont.scss */
+.icon-pencil:before {
+  content: "\e600";
+}
+
+/* line 12, ../../../compass/scss/components/_po-projects_webfont.scss */
+.icon-download:before {
+  content: "\e601";
+}
+
+/* line 16, ../../../compass/scss/components/_po-projects_webfont.scss */
+.icon-toggle-off:before, .catalog-messages-form .row-wrapper .message-row.disabled > .fuzzy-field > .holder.checkbox label:after,
+.catalog-messages-form .row-wrapper .message-row.enabled.disabled > .fuzzy-field > .holder.checkbox label:after, .catalog-messages-form .row-wrapper .message-row.fuzzy > .fuzzy-field > .holder.checkbox label:after,
+.catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .fuzzy-field > .holder.checkbox label:after {
+  content: "\e602";
+}
+
+/* line 20, ../../../compass/scss/components/_po-projects_webfont.scss */
 .icon-toggle-on:before, .catalog-messages-form .row-wrapper .message-row > .fuzzy-field > .holder.checkbox label:after,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field > .holder.checkbox label:after {
-  content: "\f205";
+  content: "\e603";
+}
+
+/* line 24, ../../../compass/scss/components/_po-projects_webfont.scss */
+.icon-eye:before {
+  content: "\e9ce";
+}
+
+/* line 28, ../../../compass/scss/components/_po-projects_webfont.scss */
+.icon-eye-plus:before {
+  content: "\e9cf";
 }
 
 /* 
@@ -9623,13 +9648,13 @@ ul.list-group > li > p + * {
 /*
  * For PO-Projects
  */
-/* line 49, ../../../compass/scss/components/_po-projects.scss */
+/* line 54, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form {
   /*
    * Translation statistics and submit menu
    */
 }
-/* line 53, ../../../compass/scss/components/_po-projects.scss */
+/* line 58, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .fixed-menu {
   margin: 0;
   background-color: #f2f2f2;
@@ -9641,35 +9666,39 @@ ul.list-group > li > p + * {
   -webkit-border-bottom-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
-/* line 59, ../../../compass/scss/components/_po-projects.scss */
+/* line 64, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .fixed-menu.fixed-menu-clone {
   margin: 0 auto;
   width: 100%;
   max-width: 62.5rem;
   border-top: 0;
 }
-/* line 66, ../../../compass/scss/components/_po-projects.scss */
+/* line 71, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .fixed-menu > dd {
   margin: 0;
   padding: 0.3125rem;
 }
-/* line 70, ../../../compass/scss/components/_po-projects.scss */
+/* line 75, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .fixed-menu > dd + dd {
   margin-left: 0.625rem;
 }
-/* line 74, ../../../compass/scss/components/_po-projects.scss */
+/* line 79, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .fixed-menu > dd .label {
   margin-bottom: 0;
 }
-/* line 77, ../../../compass/scss/components/_po-projects.scss */
+/* line 82, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .fixed-menu > dd .button {
   margin-bottom: 0;
 }
-/* line 83, ../../../compass/scss/components/_po-projects.scss */
+/* line 87, ../../../compass/scss/components/_po-projects.scss */
+.catalog-messages-form .fixed-menu .close-all-locations {
+  display: none;
+}
+/* line 92, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper {
   margin-top: 0.9375rem;
 }
-/* line 88, ../../../compass/scss/components/_po-projects.scss */
+/* line 97, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .anchor a {
   float: right;
   display: block;
@@ -9677,7 +9706,56 @@ ul.list-group > li > p + * {
   line-height: 1;
   padding: 0.1875rem;
 }
-/* line 98, ../../../compass/scss/components/_po-projects.scss */
+/* line 106, ../../../compass/scss/components/_po-projects.scss */
+.catalog-messages-form .row-wrapper .locations {
+  padding: 0.125rem 0;
+  margin-left: 15px;
+  font-size: 0.6875rem;
+  font-family: monospace;
+  color: #666666;
+  background-color: #f2f2f2;
+  border: 1px solid #e6e6e6;
+  -moz-border-radius-bottomleft: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  -moz-border-radius-bottomright: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+/* line 116, ../../../compass/scss/components/_po-projects.scss */
+.catalog-messages-form .row-wrapper .locations .title {
+  margin-left: 0.5rem;
+  margin-bottom: 0;
+  font-size: inherit;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+}
+/* line 124, ../../../compass/scss/components/_po-projects.scss */
+.catalog-messages-form .row-wrapper .locations .title:hover {
+  text-decoration: underline;
+}
+/* line 129, ../../../compass/scss/components/_po-projects.scss */
+.catalog-messages-form .row-wrapper .locations ul {
+  display: none;
+  margin-bottom: 0;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
+}
+/* line 138, ../../../compass/scss/components/_po-projects.scss */
+.catalog-messages-form .row-wrapper .locations.opened {
+  padding: 0.25rem 0;
+}
+/* line 141, ../../../compass/scss/components/_po-projects.scss */
+.catalog-messages-form .row-wrapper .locations.opened .title {
+  margin-bottom: 0.25rem;
+}
+/* line 144, ../../../compass/scss/components/_po-projects.scss */
+.catalog-messages-form .row-wrapper .locations.opened ul {
+  display: block;
+}
+/* line 151, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row,
 .catalog-messages-form .row-wrapper .message-row.enabled {
   position: relative;
@@ -9692,17 +9770,17 @@ ul.list-group > li > p + * {
   * Changing colors When the row is fuzzy
   */
 }
-/* line 102, ../../../compass/scss/components/_po-projects.scss */
+/* line 155, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row:first-child,
 .catalog-messages-form .row-wrapper .message-row.enabled:first-child {
   margin-top: 0;
 }
-/* line 105, ../../../compass/scss/components/_po-projects.scss */
+/* line 158, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row + hr,
 .catalog-messages-form .row-wrapper .message-row.enabled + hr {
   display: none;
 }
-/* line 113, ../../../compass/scss/components/_po-projects.scss */
+/* line 166, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .fuzzy-field,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field {
   display: inline-block;
@@ -9710,7 +9788,7 @@ ul.list-group > li > p + * {
   top: 0;
   left: 15px;
 }
-/* line 119, ../../../compass/scss/components/_po-projects.scss */
+/* line 172, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .fuzzy-field > .holder.checkbox,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field > .holder.checkbox {
   padding: 0.25rem 0.25rem 0.125rem;
@@ -9738,7 +9816,7 @@ ul.list-group > li > p + * {
   -o-transform-origin: left top;
   transform-origin: left top;
 }
-/* line 132, ../../../compass/scss/components/_po-projects.scss */
+/* line 185, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .fuzzy-field > .holder.checkbox input, .catalog-messages-form .row-wrapper .message-row > .fuzzy-field > .holder.checkbox label,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field > .holder.checkbox input,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field > .holder.checkbox label {
@@ -9746,12 +9824,12 @@ ul.list-group > li > p + * {
   padding: 0;
   color: inherit;
 }
-/* line 138, ../../../compass/scss/components/_po-projects.scss */
+/* line 191, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .fuzzy-field > .holder.checkbox input,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field > .holder.checkbox input {
   display: none;
 }
-/* line 142, ../../../compass/scss/components/_po-projects.scss */
+/* line 195, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .fuzzy-field > .holder.checkbox label,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field > .holder.checkbox label {
   margin-bottom: 0.125rem;
@@ -9770,7 +9848,7 @@ ul.list-group > li > p + * {
   -o-transform-origin: center center;
   transform-origin: center center;
 }
-/* line 151, ../../../compass/scss/components/_po-projects.scss */
+/* line 204, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .fuzzy-field > .holder.checkbox label:after,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field > .holder.checkbox label:after {
   margin-left: 0.0625rem;
@@ -9780,12 +9858,12 @@ ul.list-group > li > p + * {
   -moz-osx-font-smoothing: grayscale;
   text-decoration: none;
 }
-/* line 160, ../../../compass/scss/components/_po-projects.scss */
+/* line 213, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .fuzzy-field > .holder.checkbox label:hover,
 .catalog-messages-form .row-wrapper .message-row.enabled > .fuzzy-field > .holder.checkbox label:hover {
   text-decoration: underline;
 }
-/* line 167, ../../../compass/scss/components/_po-projects.scss */
+/* line 220, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container {
   margin-left: 15px;
@@ -9794,18 +9872,18 @@ ul.list-group > li > p + * {
   background-color: #00b2ed;
   border: 1px solid #0079a1;
 }
-/* line 174, ../../../compass/scss/components/_po-projects.scss */
+/* line 227, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container > .flex-item,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container > .flex-item {
   display: flex;
   align-items: stretch;
 }
-/* line 178, ../../../compass/scss/components/_po-projects.scss */
+/* line 231, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container > .flex-item label,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container > .flex-item label {
   display: none;
 }
-/* line 183, ../../../compass/scss/components/_po-projects.scss */
+/* line 236, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container > .flex-item.source,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container > .flex-item.source {
   margin-right: 0.15625rem;
@@ -9816,7 +9894,7 @@ ul.list-group > li > p + * {
   border: 1px solid #00b2ed;
   background-color: #edfbff;
 }
-/* line 193, ../../../compass/scss/components/_po-projects.scss */
+/* line 246, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container > .flex-item.source p,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container > .flex-item.source p {
   margin-bottom: 0.75rem;
@@ -9825,23 +9903,23 @@ ul.list-group > li > p + * {
   color: inherit;
   white-space: pre-wrap;
 }
-/* line 200, ../../../compass/scss/components/_po-projects.scss */
+/* line 253, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container > .flex-item.source p:last-child,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container > .flex-item.source p:last-child {
   margin-bottom: 0;
 }
-/* line 206, ../../../compass/scss/components/_po-projects.scss */
+/* line 259, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container > .flex-item.source .explicit_cr,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container > .flex-item.source .explicit_cr {
   color: black;
   font-weight: bold;
 }
-/* line 213, ../../../compass/scss/components/_po-projects.scss */
+/* line 266, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container > .flex-item.edit,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container > .flex-item.edit {
   margin-left: 0.15625rem;
 }
-/* line 215, ../../../compass/scss/components/_po-projects.scss */
+/* line 268, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row > .flex-container > .flex-item.edit textarea,
 .catalog-messages-form .row-wrapper .message-row.enabled > .flex-container > .flex-item.edit textarea {
   display: block;
@@ -9852,7 +9930,7 @@ ul.list-group > li > p + * {
   line-height: 1.0625rem;
   border-color: #00526e;
 }
-/* line 232, ../../../compass/scss/components/_po-projects.scss */
+/* line 285, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.disabled > .fuzzy-field > .holder.checkbox,
 .catalog-messages-form .row-wrapper .message-row.enabled.disabled > .fuzzy-field > .holder.checkbox {
   color: #333333;
@@ -9860,36 +9938,36 @@ ul.list-group > li > p + * {
   border: 1px solid #e6e6e6;
   border-top: 1px solid #f2f2f2;
 }
-/* line 238, ../../../compass/scss/components/_po-projects.scss */
+/* line 291, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.disabled > .fuzzy-field > .holder.checkbox input, .catalog-messages-form .row-wrapper .message-row.disabled > .fuzzy-field > .holder.checkbox label,
 .catalog-messages-form .row-wrapper .message-row.enabled.disabled > .fuzzy-field > .holder.checkbox input,
 .catalog-messages-form .row-wrapper .message-row.enabled.disabled > .fuzzy-field > .holder.checkbox label {
   color: inherit;
 }
-/* line 242, ../../../compass/scss/components/_po-projects.scss */
+/* line 295, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.disabled > .fuzzy-field > .holder.checkbox label,
 .catalog-messages-form .row-wrapper .message-row.enabled.disabled > .fuzzy-field > .holder.checkbox label {
   font-weight: normal;
 }
-/* line 249, ../../../compass/scss/components/_po-projects.scss */
+/* line 302, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.disabled > .flex-container,
 .catalog-messages-form .row-wrapper .message-row.enabled.disabled > .flex-container {
   background-color: #f2f2f2;
   border: 1px solid #e6e6e6;
 }
-/* line 254, ../../../compass/scss/components/_po-projects.scss */
+/* line 307, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.disabled > .flex-container > .flex-item.source,
 .catalog-messages-form .row-wrapper .message-row.enabled.disabled > .flex-container > .flex-item.source {
   color: #666666;
   border: 1px solid #e6e6e6;
   background-color: white;
 }
-/* line 261, ../../../compass/scss/components/_po-projects.scss */
+/* line 314, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.disabled > .flex-container > .flex-item.edit textarea,
 .catalog-messages-form .row-wrapper .message-row.enabled.disabled > .flex-container > .flex-item.edit textarea {
   border-color: #cccccc;
 }
-/* line 273, ../../../compass/scss/components/_po-projects.scss */
+/* line 326, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.fuzzy > .fuzzy-field > .holder.checkbox,
 .catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .fuzzy-field > .holder.checkbox {
   color: #333333;
@@ -9897,40 +9975,40 @@ ul.list-group > li > p + * {
   border: 1px solid #ea7d10;
   border-top: 1px solid #f3a354;
 }
-/* line 279, ../../../compass/scss/components/_po-projects.scss */
+/* line 332, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.fuzzy > .fuzzy-field > .holder.checkbox input, .catalog-messages-form .row-wrapper .message-row.fuzzy > .fuzzy-field > .holder.checkbox label,
 .catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .fuzzy-field > .holder.checkbox input,
 .catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .fuzzy-field > .holder.checkbox label {
   color: inherit;
 }
-/* line 283, ../../../compass/scss/components/_po-projects.scss */
+/* line 336, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.fuzzy > .fuzzy-field > .holder.checkbox label,
 .catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .fuzzy-field > .holder.checkbox label {
   font-weight: normal;
 }
-/* line 290, ../../../compass/scss/components/_po-projects.scss */
+/* line 343, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.fuzzy > .flex-container,
 .catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .flex-container {
   background-color: #f3a354;
   border: 1px solid #ea7d10;
 }
-/* line 295, ../../../compass/scss/components/_po-projects.scss */
+/* line 348, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.fuzzy > .flex-container > .flex-item.source,
 .catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .flex-container > .flex-item.source {
   color: #333333;
   border: 1px solid #f3a354;
   background-color: #fffdfb;
 }
-/* line 302, ../../../compass/scss/components/_po-projects.scss */
+/* line 355, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form .row-wrapper .message-row.fuzzy > .flex-container > .flex-item.edit textarea,
 .catalog-messages-form .row-wrapper .message-row.enabled.fuzzy > .flex-container > .flex-item.edit textarea {
   border-color: #bb640d;
 }
-/* line 314, ../../../compass/scss/components/_po-projects.scss */
+/* line 367, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form > .button-holder.panel {
   margin-top: 0.875rem;
 }
-/* line 317, ../../../compass/scss/components/_po-projects.scss */
+/* line 370, ../../../compass/scss/components/_po-projects.scss */
 .catalog-messages-form > .button-holder.panel .button {
   margin: 0;
 }
@@ -9938,23 +10016,23 @@ ul.list-group > li > p + * {
 /*
  * Catalog table statistics
  */
-/* line 327, ../../../compass/scss/components/_po-projects.scss */
+/* line 380, ../../../compass/scss/components/_po-projects.scss */
 .catalog-statistics {
   width: 100%;
 }
-/* line 330, ../../../compass/scss/components/_po-projects.scss */
+/* line 383, ../../../compass/scss/components/_po-projects.scss */
 .catalog-statistics .locale-code {
   font-family: monospace;
 }
-/* line 335, ../../../compass/scss/components/_po-projects.scss */
+/* line 388, ../../../compass/scss/components/_po-projects.scss */
 .catalog-statistics .sub-nav dd:first-of-type {
   margin-left: 0;
 }
-/* line 340, ../../../compass/scss/components/_po-projects.scss */
+/* line 393, ../../../compass/scss/components/_po-projects.scss */
 .catalog-statistics .progress {
   margin-bottom: 0;
 }
-/* line 343, ../../../compass/scss/components/_po-projects.scss */
+/* line 396, ../../../compass/scss/components/_po-projects.scss */
 .catalog-statistics .progress-score {
   font-size: 12px;
 }

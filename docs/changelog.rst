@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.8.1 - 06 March 2015
+-----------------------------
+
+* Display translation locations for each item in catalog's translation form and some interface stuff for them;
+
 Version 0.8.0 - 04 March 2015
 -----------------------------
 

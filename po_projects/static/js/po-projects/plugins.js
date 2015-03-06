@@ -136,4 +136,50 @@ $.fn.update_translation_stats = function(options) {
     });
 };
 
+/*
+ * Toggle translations locations display
+ */
+$.fn.toggle_locations = function(options) {
+    return this.each(function() {
+        var $form = $(this),
+            settings = $.extend({
+                'open_all_button_selector': ".fixed-menu .open-all-locations",
+                'close_all_button_selector': ".fixed-menu .close-all-locations",
+                'toggle_button_item_selector': ".locations > .title",
+                'item_selector': ".locations"
+            }, options);
+            
+        // Toggle button for each item
+        $(settings.toggle_button_item_selector, $form).click(function(e) {
+            var $item_sel = $(settings.item_selector, $form);
+            if($item_sel.hasClass('opened')){
+                $item_sel.removeClass('opened').addClass('closed').show();
+            } else {
+                $item_sel.removeClass('closed').addClass('opened').show();
+            }
+            return false;
+        });
+        
+        // Button to open all items
+        $(settings.open_all_button_selector, $form).on( "click", function() {
+            $(settings.item_selector, $form).each(function() {
+                $(this).removeClass('closed').addClass('opened').show();
+                $(settings.open_all_button_selector, $form).hide();
+                $(settings.close_all_button_selector, $form).show();
+            });
+            return false;
+        });
+        
+        // Button to close all items
+        $(settings.close_all_button_selector, $form).on( "click", function() {
+            $(settings.item_selector, $form).each(function() {
+                $(this).removeClass('opened').addClass('closed').show();
+                $(settings.close_all_button_selector, $form).hide();
+                $(settings.open_all_button_selector, $form).show();
+            });
+            return false;
+        });
+    });
+};
+
 }( jQuery ));

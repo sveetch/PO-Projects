@@ -53,11 +53,13 @@ class SourceTextField(UneditableField):
 
         return super(SourceTextField, self).render(form, form_style, context, template_pack=TEMPLATE_PACK)
 
+
 class HiddenField(UneditableField):
     """
     Layout object for rendering template field value as hidden field
     """
     template = "po_projects/hidden_field.html"
+
 
 def source_formatter(value, autoescape=True):
     """
@@ -73,6 +75,18 @@ def source_formatter(value, autoescape=True):
     else:
         paras = ['<p>%s</p>' % p.replace('\n', u'<span class="explicit_cr">↵</span><br />') for p in paras]
     return '\n\n'.join(paras)
+
+
+def build_locations(locations):
+    """
+    Output a bullet list from message's location items
+    """
+    output = u"<ul>{0}</ul>"
+    items = []
+    for location, lineno in locations:
+        items.append(u"<li>{location}:{lineno}</li>".format(location=location, lineno=lineno))
+    return output.format('\n'.join(items))
+
 
 def project_helper(instance=None, form_tag=True):
     """
@@ -254,6 +268,15 @@ def translation_helper(instance=None, prefix='', form_tag=False):
                 ),
                 *message_contents,
                 css_class=' '.join(row_css_classes)
+            ),
+            Div(
+                HTML('<p class="title"><i class="icon-eye"></i> '),
+                HTML(_('Locations')),
+                HTML('</p>'),
+                HTML(
+                    build_locations(instance.template.get_locations_set()),
+                ),
+                css_class='locations',
             ),
             css_class='row-wrapper',
         ),

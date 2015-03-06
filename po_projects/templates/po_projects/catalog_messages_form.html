@@ -7,20 +7,27 @@
 //<![CDATA[
 $(document).ready(function($) {
     var $form = $('.catalog-messages-form');
-    
+    // Display and manage Fuzzy checkbox as a button
     $(".holder.checkbox > input", $form).mark_fuzzy_translation({
         'status_fuzzy_label': "{% trans "Fuzzy" %}",
         'status_enabled_label': "{% trans "Enabled" %}"
     });
-    
+    // Update stats in fixed menu when fuzzy or content are changed
     $(".holder.checkbox > input, .holder.edit > textarea", $form).update_translation_stats({
         'fuzzy_count_selector': '.holder.checkbox > input',
         'empty_count_selector': '.holder.edit > textarea',
         'fuzzy_value_selector': '.fixed-menu .po-trans-stats-fuzzy span.value',
         'empty_value_selector': '.fixed-menu .po-trans-stats-empty span.value'
     });
-    
+    // Manage the fixed menu behaviors
     $('.fixed-menu', $form).fixed_menu();
+    // Manage locations show/hide
+    $($form).toggle_locations({
+        'open_all_button_selector': ".fixed-menu .open-all-locations",
+        'close_all_button_selector': ".fixed-menu .close-all-locations",
+        'toggle_button_item_selector': ".locations > .title",
+        'item_selector': ".locations"
+    });
 });
 //]]>
 </script>
@@ -37,7 +44,11 @@ $(document).ready(function($) {
         <dd><span class="label warning radius po-trans-stats-fuzzy">{% trans "Fuzzy" %}: <span class="value">{{ catalog.count_fuzzy_translations }}</span></span></dd>
         <dd><span class="label secondary radius po-trans-stats-empty">{% trans "Empty" %}: <span class="value">{{ catalog.count_empty_translations }}</span></span></dd>
         <dd class="right">
-            <input type="submit" id="submit-id-submit" class="button tiny" value="{% trans "Save" %}" name="submit">
+            <ul class="button-group">
+                <li><button class="button tiny secondary radius open-all-locations"><i class="icon-eye"></i>&#160;{% trans "Show all locations" %}</button></li>
+                <li><button class="button tiny secondary radius close-all-locations"><i class="icon-eye-blocked"></i>&#160;{% trans "Hide all locations" %}</button></li>
+                <li><input type="submit" id="submit-id-submit" class="button tiny" value="{% trans "Save" %}" name="submit"></li>
+            </ul>
         </dd>
     </dl>
     

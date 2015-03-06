@@ -21,6 +21,6 @@
     
     {% if perms.po_projects.add_project %}<hr>
     <p class="text-center">
-        <a href="{% url 'po_projects:project-create' %}" class="button large">{% trans "Start a new project" %}</a>
+        <a href="{% url 'po_projects:project-create' %}" class="button large"><i class="icon-plus-square"></i> {% trans "Start a new project" %}</a>
     </p>{% endif %}
 {% endblock %}

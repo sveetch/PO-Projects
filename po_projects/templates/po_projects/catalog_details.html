@@ -40,11 +40,19 @@
             </tr>
         </tbody>
     </table>
-    <div class="clearfix">
+    {% comment %}<div class="clearfix">
         <ul class="button-group stack-for-small radius right">
             <li><a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Download PO" %}</a></li>
             {% if perms.po_projects.edit_messages %}<li><a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button">{% trans "Edit messages" %}</a></li>{% endif %}
         </ul>
+    </div>{% endcomment %}
+    <div class="row">
+        <div class="large-6 columns text-left">
+            <a href="{% url 'po_projects:catalog-messages-download' slug=project.slug locale=catalog.locale %}" class="button small secondary radius"><i class="icon-download"></i> {% trans "Download PO" %}</a>
+        </div>
+        <div class="large-6 columns text-right">
+            {% if perms.po_projects.edit_messages %}<a href="{% url 'po_projects:catalog-messages-edit' slug=project.slug locale=catalog.locale %}" class="button small radius">{% trans "Edit messages" %} <i class="icon-pencil"></i></a>{% endif %}
+        </div>
     </div>
     {% endwith %}
     

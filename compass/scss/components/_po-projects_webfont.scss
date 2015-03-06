@@ -1,10 +1,30 @@
 /*
  * PO-Projects icon set from icomoon
  */
+.icon-cog:before {
+    content: "\e604";
+}
+
+.icon-pencil:before {
+    content: "\e600";
+}
+
+.icon-download:before {
+    content: "\e601";
+}
+
 .icon-toggle-off:before {
-        content: "\f204";
+    content: "\e602";
 }
 
 .icon-toggle-on:before {
-        content: "\f205";
+    content: "\e603";
+}
+
+.icon-eye:before {
+    content: "\e9ce";
+}
+
+.icon-eye-plus:before {
+    content: "\e9cf";
 }

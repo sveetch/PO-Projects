@@ -37,8 +37,8 @@
         <div class="column large-7">
             <div class="clearfix">
                 <ul class="button-group stack-for-small radius right">
-                    <li><a href="{% url 'po_projects:project-download' slug=project.slug %}" class="button small">{% trans "Download full archive" %}</a></li>
-                    {% if perms.po_projects.change_project %}<li><a href="{% url 'po_projects:project-update' slug=project.slug %}" class="button small">{% trans "Settings" %}</a></li>{% endif %}
+                    <li><a href="{% url 'po_projects:project-download' slug=project.slug %}" class="button secondary small"><i class="icon-download"></i> {% trans "Download full archive" %}</a></li>
+                    {% if perms.po_projects.change_project %}<li><a href="{% url 'po_projects:project-update' slug=project.slug %}" class="button small">{% trans "Settings" %} <i class="icon-gear"></i></a></li>{% endif %}
                 </ul>
             </div>
         </div>
