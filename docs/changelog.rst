@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.8.2.1 - 07 March 2015
+-------------------------------
+
+* Update french translations;
+
 Version 0.8.2 - 07 March 2015
 -----------------------------
 

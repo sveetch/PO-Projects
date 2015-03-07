@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-19 04:07+0100\n"
+"POT-Creation-Date: 2015-03-07 03:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr "Créer un projet"
 msgid "<small class=\"subhead\">Project</small> {{ project.name }}"
 msgstr "<small class=\"subhead\">Projet</small> {{ project.name }}"
 
-#: crumbs.py:8 templates/po_projects/catalog_details.html:52
+#: crumbs.py:8 templates/po_projects/catalog_details.html:61
 #: templates/po_projects/project_details.html:42
 msgid "Settings"
 msgstr "Paramètres"
@@ -41,111 +41,119 @@ msgid "<small class=\"subhead\">Catalog</small> {{ catalog.get_locale_name }}"
 msgstr ""
 "<small class=\"subhead\">Catalogue</small> {{ catalog.get_locale_name }}"
 
-#: crumbs.py:11 templates/po_projects/catalog_details.html:46
+#: crumbs.py:11 templates/po_projects/catalog_details.html:55
 msgid "Edit messages"
 msgstr "Éditer les messages"
 
-#: models.py:30
+#: models.py:32
 msgid "name"
 msgstr "nom"
 
-#: models.py:31
+#: models.py:33
 msgid "slug"
 msgstr "nom de raccourci"
 
-#: models.py:32
+#: models.py:34
 msgid "translation domain"
 msgstr "domain de traduction"
 
-#: models.py:33
+#: models.py:35
 msgid "description"
 msgstr ""
 
-#: models.py:42 models.py:49
+#: models.py:44 models.py:53
 msgid "project"
 msgstr "projet"
 
-#: models.py:43
+#: models.py:45
 msgid "projects"
 msgstr "projets"
 
-#: models.py:50
+#: models.py:54
 msgid "version"
 msgstr ""
 
-#: models.py:51 models.py:116
+#: models.py:55 models.py:92
 msgid "header comment"
 msgstr "entête de commentaire"
 
-#: models.py:52 models.py:117
+#: models.py:56 models.py:93
 msgid "mime headers"
 msgstr "entêtes mime"
 
-#: models.py:74 models.py:81 models.py:114
+#: models.py:81 models.py:90 models.py:172
 msgid "project version"
 msgstr "version de projet"
 
-#: models.py:75
+#: models.py:82
 msgid "projects versions"
 msgstr "versions de projets"
 
-#: models.py:82
-msgid "message id"
-msgstr "identifiant"
-
-#: models.py:83
-msgid "locations"
-msgstr "emplacements"
-
-#: models.py:84
-msgid "flags"
-msgstr "marqueurs"
-
-#: models.py:107
-msgid "template message"
-msgstr "gabarit de message"
-
-#: models.py:108
-msgid "templates messages"
-msgstr "gabarits de messages"
-
-#: models.py:115
+#: models.py:91
 msgid "locale"
 msgstr ""
 
-#: models.py:161 models.py:172 templates/po_projects/project_index.html:13
+#: models.py:160 models.py:212 templates/po_projects/project_index.html:13
 msgid "catalog"
 msgstr "catalogue"
 
-#: models.py:162
+#: models.py:161
 msgid "catalogs"
 msgstr "catalogues"
 
-#: models.py:171
-msgid "row source"
-msgstr "source"
-
-#: models.py:173 templates/po_projects/project_index.html:14
-msgid "message"
-msgstr ""
+#: models.py:173
+msgid "message id"
+msgstr "identifiant"
 
 #: models.py:174
-msgid "fuzzy"
-msgstr ""
+msgid "message plural id"
+msgstr "identifiant pluriel"
 
 #: models.py:175
+msgid "locations"
+msgstr "emplacements"
+
+#: models.py:176 models.py:216
 msgid "pluralizable"
 msgstr "plurialisable"
 
-#: models.py:176
+#: models.py:177
 msgid "python_format"
 msgstr ""
 
-#: models.py:198
+#: models.py:202
+msgid "template message"
+msgstr "gabarit de message"
+
+#: models.py:203
+msgid "templates messages"
+msgstr "gabarits de messages"
+
+#: models.py:211
+msgid "row source"
+msgstr "source"
+
+#: models.py:213 templates/po_projects/project_index.html:14
+msgid "message"
+msgstr ""
+
+#: models.py:214
+msgid "message plural"
+msgstr "pluriel"
+
+#: models.py:215
+msgid "fuzzy"
+msgstr ""
+
+#: models.py:217
+msgid "python format"
+msgstr ""
+
+#: models.py:241
 msgid "translation message"
 msgstr "traduction de message"
 
-#: models.py:199
+#: models.py:242
 msgid "translations messages"
 msgstr "traductions de messages"
 
@@ -161,15 +169,15 @@ msgstr "Domaine de Django"
 msgid "Submit"
 msgstr "Soumettre"
 
-#: forms/catalog.py:56 forms/catalog.py:104
+#: forms/catalog.py:57 forms/catalog.py:113
 msgid "You don't have permission to use this form"
 msgstr "Vous n'avez pas la permission d'utiliser ce formulaire"
 
-#: forms/catalog.py:89
+#: forms/catalog.py:97
 msgid "PO File"
 msgstr "Fichier PO"
 
-#: forms/catalog.py:89
+#: forms/catalog.py:97
 msgid ""
 "Upload a valid PO file to update catalog messages, it will only update "
 "allready existing messages from the template, it does not add new message or "
@@ -181,46 +189,50 @@ msgstr ""
 "traduction, cela n'ajoutera aucun nouveau message ni n'en supprimera. "
 "Prudence, ceci écrasera tout vos précédentes traductions."
 
-#: forms/catalog.py:115
+#: forms/catalog.py:128
 msgid "Your file does not seem to be a valid PO file"
 msgstr "Votre fichier ne semble pas être un fichier PO valide"
 
-#: forms/crispies.py:84 forms/crispies.py:202
-#: templates/po_projects/catalog_messages_form.html:42
-#: templates/po_projects/catalog_messages_form.html:55
+#: forms/crispies.py:118 forms/crispies.py:180
+#: templates/po_projects/catalog_messages_form.html:60
+#: templates/po_projects/catalog_messages_form.html:74
 msgid "Save"
 msgstr "Enregistrer"
 
-#: forms/crispies.py:135
-msgid "Type your translation here else the original text will be used"
-msgstr "Rédiger votre traduction ici sinon le texte d'origine sera utilisé"
-
-#: forms/crispies.py:164
+#: forms/crispies.py:142
 msgid "Type a locale like 'fr'"
 msgstr "Entrez un nom de locale comme 'fr'"
 
-#: forms/crispies.py:170
+#: forms/crispies.py:148
 msgid "Create"
 msgstr "Créer"
 
-#: forms/project.py:29
+#: forms/crispies.py:226 forms/crispies.py:251
+msgid "Type your translation here else the original text will be used"
+msgstr "Rédiger votre traduction ici sinon le texte d'origine sera utilisé"
+
+#: forms/crispies.py:274
+msgid "Locations"
+msgstr "Emplacements"
+
+#: forms/project.py:20
 msgid "POT File"
 msgstr "Fichier POT"
 
-#: forms/project.py:29
+#: forms/project.py:20
 msgid ""
 "Upload a valid POT file to initialize or update project strings to translate"
 msgstr ""
 "Transmettez un fichier POT valide pour initialiser ou mettre à jour les "
 "textes à traduire du projet"
 
-#: forms/project.py:49
+#: forms/project.py:40
 msgid "Your file does not seem to be a valid POT file"
 msgstr "Votre fichier ne semble pas être un fichier POT valide"
 
 #: forms/translation.py:19 templates/po_projects/catalog_details.html:36
 #: templates/po_projects/catalog_messages_form.html:12
-#: templates/po_projects/catalog_messages_form.html:39
+#: templates/po_projects/catalog_messages_form.html:54
 msgid "Fuzzy"
 msgstr ""
 
@@ -242,23 +254,31 @@ msgstr "Progression"
 
 #: templates/po_projects/catalog_details.html:31
 #: templates/po_projects/catalog_details.html:34
-#: templates/po_projects/catalog_messages_form.html:37
+#: templates/po_projects/catalog_messages_form.html:52
 msgid "Statistics"
 msgstr "Statistiques"
 
 #: templates/po_projects/catalog_details.html:35
-#: templates/po_projects/catalog_messages_form.html:38
+#: templates/po_projects/catalog_messages_form.html:53
 msgid "Total"
 msgstr ""
 
 #: templates/po_projects/catalog_details.html:37
-#: templates/po_projects/catalog_messages_form.html:40
+#: templates/po_projects/catalog_messages_form.html:55
 msgid "Empty"
 msgstr "Vide"
 
-#: templates/po_projects/catalog_details.html:45
+#: templates/po_projects/catalog_details.html:52
 msgid "Download PO"
 msgstr "Télécharger le PO"
+
+#: templates/po_projects/catalog_messages_form.html:58
+msgid "Show all locations"
+msgstr "Afficher tout les emplacements"
+
+#: templates/po_projects/catalog_messages_form.html:59
+msgid "Hide all locations"
+msgstr "Cacher tout les emplacements"
 
 #: templates/po_projects/project_details.html:8
 msgid "Catalogs"
@@ -287,3 +307,15 @@ msgstr "Il n'y a encore aucun projet"
 #: templates/po_projects/project_index.html:24
 msgid "Start a new project"
 msgstr "Démarrer un nouveau projet"
+
+#: views/catalogs.py:73
+msgid "The catalog has been edited successfully"
+msgstr "Le catalogue a été édité avec succès"
+
+#: views/catalogs.py:132
+msgid "Translations have been edited successfully"
+msgstr "Les traductions ont été édités avec succès"
+
+#: views/projects.py:181
+msgid "The project has been edited successfully"
+msgstr "Le projet a été édité avec succès"
