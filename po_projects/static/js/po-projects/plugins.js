@@ -151,7 +151,7 @@ $.fn.toggle_locations = function(options) {
             
         // Toggle button for each item
         $(settings.toggle_button_item_selector, $form).click(function(e) {
-            var $item_sel = $(settings.item_selector, $form);
+            var $item_sel = $(this).parent();
             if($item_sel.hasClass('opened')){
                 $item_sel.removeClass('opened').addClass('closed').show();
             } else {

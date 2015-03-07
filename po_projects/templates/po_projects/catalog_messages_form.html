@@ -36,6 +36,14 @@ $(document).ready(function($) {
 
 {% block content %}
 {% comment %}     {% crispy formset formset.form.helper %} {% endcomment %}
+{% if messages %}
+    {% for message in messages %}
+    <div data-alert class="alert-box {% if message.tags %}{{ message.tags }}{% endif %} radius">
+    {{ message }}
+    <a href="#" class="close">&times;</a>
+    </div>
+    {% endfor %}
+{% endif %}
 <form class="catalog-messages-form" method="post" action="."{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
     {% comment %}{% csrf_token %}{% endcomment %}
     <dl class="button-holder sub-nav fixed-menu" id="fixed-stats-menu">

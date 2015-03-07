@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.8.2 - 07 March 2015
+-----------------------------
+
+* Fix a bug with Javascript plugin for locations;
+* Add optional Django messages framework usage for some forms that self redirect when succeeded;
+
 Version 0.8.1 - 06 March 2015
 -----------------------------
 

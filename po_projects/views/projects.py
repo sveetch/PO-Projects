@@ -8,6 +8,7 @@ from cStringIO import StringIO
 #from django.db import models
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
@@ -16,6 +17,7 @@ from django.template.loader import render_to_string
 from django.views import generic
 from django.views.generic.detail import SingleObjectMixin
 from django.forms.models import modelformset_factory
+from django.utils.translation import ugettext as _
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
@@ -174,7 +176,11 @@ class ProjectUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateV
 
     def get_success_url(self):
         return reverse('po_projects:project-update', args=[self.project.slug])
-
+    
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS, _('The project has been edited successfully'), fail_silently=True)
+        return super(ProjectUpdate, self).form_valid(form)
+    
     def get_form_kwargs(self):
         kwargs = super(ProjectUpdate, self).get_form_kwargs()
         kwargs.update({

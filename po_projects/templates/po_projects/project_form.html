@@ -3,5 +3,13 @@
 {% block title %}{% if not project %}{% trans "Create a new project" %}{% else %}{% trans "Update project" %} {{ project.name }}{% endif %}{% endblock %}
 
 {% block content %}
+    {% if messages %}
+        {% for message in messages %}
+        <div data-alert class="alert-box {% if message.tags %}{{ message.tags }}{% endif %} radius">
+        {{ message }}
+        <a href="#" class="close">&times;</a>
+        </div>
+        {% endfor %}
+    {% endif %}
     {% crispy form %}
 {% endblock %}

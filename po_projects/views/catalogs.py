@@ -6,6 +6,7 @@ import json, os, StringIO
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
@@ -14,6 +15,7 @@ from django.template.loader import render_to_string
 from django.views import generic
 from django.views.generic.detail import SingleObjectMixin
 from django.forms.models import modelformset_factory
+from django.utils.translation import ugettext as _
 
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from extra_views import ModelFormSetView
@@ -66,6 +68,10 @@ class CatalogDetails(LoginRequiredMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse('po_projects:catalog-details', args=[self.project.slug, self.object.locale])
+    
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.SUCCESS, _('The catalog has been edited successfully'), fail_silently=True)
+        return super(CatalogDetails, self).form_valid(form)
 
     def get_form_kwargs(self):
         kwargs = super(CatalogDetails, self).get_form_kwargs()
@@ -121,6 +127,10 @@ class CatalogMessagesFormView(LoginRequiredMixin, PermissionRequiredMixin, Model
 
     def get_queryset(self):
         return super(CatalogMessagesFormView, self).get_queryset().select_related('template').filter(catalog=self.catalog)
+    
+    def formset_valid(self, formset):
+        messages.add_message(self.request, messages.SUCCESS, _('Translations have been edited successfully'), fail_silently=True)
+        return super(CatalogMessagesFormView, self).formset_valid(formset)
 
 
 class CatalogMessagesExportView(LoginRequiredMixin, DownloadMixin, generic.View):

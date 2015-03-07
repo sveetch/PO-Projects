@@ -28,6 +28,12 @@ Finally mount its urls in your main ``urls.py`` : ::
         ...
     )
 
+Use messages
+============
+
+Some forms supports optional usage of Django's messages framework if it's enabled in your settings, defaut settings file created by Django's commandline tool ``startproject`` allready do it for you, see the Django's documentation for more details.
+
+
 External API access
 ===================
 

@@ -58,5 +58,13 @@
     
     {% if perms.po_projects.change_catalog %}<hr>
     <h3>{% trans "Settings" %}</h3>
+    {% if messages %}
+        {% for message in messages %}
+        <div data-alert class="alert-box {% if message.tags %}{{ message.tags }}{% endif %} radius">
+        {{ message }}
+        <a href="#" class="close">&times;</a>
+        </div>
+        {% endfor %}
+    {% endif %}
     {% crispy form %}{% endif %}
 {% endblock %}
