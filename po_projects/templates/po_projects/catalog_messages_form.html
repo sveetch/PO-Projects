@@ -35,7 +35,6 @@ $(document).ready(function($) {
 
 
 {% block content %}
-{% comment %}     {% crispy formset formset.form.helper %} {% endcomment %}
 {% if messages %}
     {% for message in messages %}
     <div data-alert class="alert-box {% if message.tags %}{{ message.tags }}{% endif %} radius">
@@ -45,7 +44,7 @@ $(document).ready(function($) {
     {% endfor %}
 {% endif %}
 <form class="catalog-messages-form" method="post" action="."{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
-    {% comment %}{% csrf_token %}{% endcomment %}
+    {% csrf_token %}
     <dl class="button-holder sub-nav fixed-menu" id="fixed-stats-menu">
         <dt style="display:none;">{% trans "Statistics" %}</dt>
         <dd><span class="label info radius po-trans-stats-total">{% trans "Total" %}: <span class="value">{{ catalog.translationmsg_set.count }}</span></span></dd>

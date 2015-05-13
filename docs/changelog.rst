@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.8.3 - 13 May 2015
+---------------------------
+
+* Fix missing CSRF input in catalog messages form;
+
 Version 0.8.2.1 - 07 March 2015
 -------------------------------
 
